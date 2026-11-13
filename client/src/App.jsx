@@ -17,6 +17,15 @@ import {
 
 export default function App() {
   // Authentication State
+  const [authenticatedUser, setAuthenticatedUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('campus_auth_user') || localStorage.getItem('campus_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('campus_user');
@@ -106,8 +115,10 @@ export default function App() {
   }, []);
 
   const handleLoginSuccess = (user) => {
+    setAuthenticatedUser(user);
     setCurrentUser(user);
     setCurrentRole(user.role || 'student');
+    localStorage.setItem('campus_auth_user', JSON.stringify(user));
     if (user.role === 'technician') setActiveTab('tech-assigned');
     else if (user.role === 'admin') setActiveTab('dashboard');
     else setActiveTab('my-requests');
@@ -117,12 +128,66 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem('campus_user');
     localStorage.removeItem('campus_token');
+    localStorage.removeItem('campus_auth_user');
+    setAuthenticatedUser(null);
     setCurrentUser(null);
     showToast('Signed out successfully');
   };
 
   const handleRoleChange = (role) => {
     setCurrentRole(role);
+    
+    // Switch active identity so non-student modes do not display student credentials
+    if (role === 'student') {
+      if (authenticatedUser && authenticatedUser.role === 'student') {
+        setCurrentUser(authenticatedUser);
+      } else {
+        setCurrentUser({
+          _id: 'student_ops',
+          name: 'Student Member',
+          role: 'student',
+          department: 'MCA Department',
+          email: 'student@jims.edu'
+        });
+      }
+    } else if (role === 'technician') {
+      if (authenticatedUser && authenticatedUser.role === 'technician') {
+        setCurrentUser(authenticatedUser);
+      } else {
+        setCurrentUser({
+          _id: 'tech_active',
+          name: 'Field Technician',
+          role: 'technician',
+          trade: 'Electrical & Facility Repairs',
+          email: 'technician@jims.edu'
+        });
+      }
+    } else if (role === 'admin') {
+      if (authenticatedUser && authenticatedUser.role === 'admin') {
+        setCurrentUser(authenticatedUser);
+      } else {
+        setCurrentUser({
+          _id: 'admin_active',
+          name: 'Campus Administrator',
+          role: 'admin',
+          department: 'Facility Operations Directorate',
+          email: 'admin@jims.edu'
+        });
+      }
+    } else if (role === 'staff') {
+      if (authenticatedUser && authenticatedUser.role === 'staff') {
+        setCurrentUser(authenticatedUser);
+      } else {
+        setCurrentUser({
+          _id: 'staff_active',
+          name: 'Faculty & Department Staff',
+          role: 'staff',
+          department: 'Academic Block B',
+          email: 'faculty@jims.edu'
+        });
+      }
+    }
+
     if (role === 'student' || role === 'staff') {
       setActiveTab('my-requests');
     } else if (role === 'technician') {

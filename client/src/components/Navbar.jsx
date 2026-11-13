@@ -32,11 +32,43 @@ export default function Navbar({
     student: { label: 'Student', color: 'from-blue-500 to-indigo-600' },
     staff: { label: 'Faculty & Staff', color: 'from-emerald-500 to-teal-600' },
     technician: { label: 'Field Technician', color: 'from-amber-500 to-orange-600' },
-    admin: { label: 'Administrator', color: 'from-purple-500 to-pink-600' }
+    admin: { label: 'Campus Administrator', color: 'from-purple-500 to-pink-600' }
   };
 
   const currentRoleConfig = roleLabels[currentRole] || roleLabels.student;
-  const displayName = currentUser?.name || currentRoleConfig.label;
+
+  // Determine display name strictly according to active role so student credentials don't linger
+  const displayName = (() => {
+    if (currentRole === 'student') {
+      return (currentUser?.role === 'student' && currentUser?.name) ? currentUser.name : 'Student Member';
+    }
+    if (currentRole === 'technician') {
+      return (currentUser?.role === 'technician' && currentUser?.name) ? currentUser.name : 'Field Technician';
+    }
+    if (currentRole === 'admin') {
+      return (currentUser?.role === 'admin' && currentUser?.name) ? currentUser.name : 'Campus Administrator';
+    }
+    if (currentRole === 'staff') {
+      return (currentUser?.role === 'staff' && currentUser?.name) ? currentUser.name : 'Faculty & Staff';
+    }
+    return currentRoleConfig.label;
+  })();
+
+  const displaySubtitle = (() => {
+    if (currentRole === 'student' && currentUser?.role === 'student' && currentUser?.enrollmentNumber) {
+      return currentUser.enrollmentNumber;
+    }
+    if (currentRole === 'technician') {
+      return 'Campus Maintenance Trade';
+    }
+    if (currentRole === 'admin') {
+      return 'Facility Directorate';
+    }
+    if (currentRole === 'staff') {
+      return 'Academic Department';
+    }
+    return currentRoleConfig.label;
+  })();
 
   // Dynamic Navigation Items Tailored Specifically to Role Capabilities (No synopsis, no facility directory)
   const getNavItems = () => {
@@ -153,7 +185,7 @@ export default function Navbar({
                   <div className="px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
                     <div className="text-xs font-bold text-white truncate">{displayName}</div>
                     <div className="text-[10px] text-fuchsia-400 font-mono">
-                      {currentUser?.enrollmentNumber || currentUser?.department || currentRoleConfig.label}
+                      {displaySubtitle}
                     </div>
                   </div>
 
