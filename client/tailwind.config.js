@@ -6,15 +6,32 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
       colors: {
-        jims: {
-          50: '#f0f5ff',
-          100: '#e0ecff',
-          500: '#2563eb',
-          600: '#1d4ed8',
-          700: '#1e40af',
-          800: '#1e3a8a',
-          900: '#172554'
+        aura: {
+          peach: '#FFB896',
+          rose: '#FF6B95',
+          purple: '#9B51E0',
+          violet: '#6366F1',
+          cyan: '#38BDF8',
+        }
+      },
+      animation: {
+        'mesh-float': 'meshFloat 18s ease-in-out infinite alternate',
+        'mesh-spin': 'meshSpin 25s linear infinite',
+      },
+      keyframes: {
+        meshFloat: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '50%': { transform: 'translate(60px, -40px) scale(1.1)' },
+          '100%': { transform: 'translate(-40px, 30px) scale(0.95)' },
+        },
+        meshSpin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         }
       }
     },

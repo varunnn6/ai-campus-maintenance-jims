@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
   Search, 
-  Filter, 
-  MapPin, 
   ChevronRight,
-  Plus
+  Plus,
+  Sparkles,
+  SlidersHorizontal
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -57,115 +57,115 @@ export default function ComplaintsListView({
 
   const getPriorityStyle = (priority) => {
     switch (priority) {
-      case 'Critical': return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
-      case 'High': return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
-      case 'Medium': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-      default: return 'text-slate-400 bg-slate-800 border-slate-700';
+      case 'Critical': return 'text-rose-300 bg-rose-500/20 border-rose-400/30';
+      case 'High': return 'text-amber-300 bg-amber-500/20 border-amber-400/30';
+      case 'Medium': return 'text-sky-300 bg-sky-500/20 border-sky-400/30';
+      default: return 'text-slate-300 bg-white/10 border-white/15';
     }
   };
 
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Resolved':
-      case 'Closed': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-      case 'In Progress': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-      case 'Assigned': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-      default: return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+      case 'Closed': return 'text-emerald-300 bg-emerald-500/20 border-emerald-400/30';
+      case 'In Progress': return 'text-violet-300 bg-violet-500/20 border-violet-400/30';
+      case 'Assigned': return 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-400/30';
+      default: return 'text-amber-300 bg-amber-500/20 border-amber-400/30';
     }
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       
-      {/* Top Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3 rounded-xl bg-[#111622] border border-white/[0.08]">
+      {/* Search & Control Pill Bar */}
+      <div className="p-3 sm:p-4 rounded-[28px] glass-card border border-white/15 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xl backdrop-blur-2xl">
         
-        {/* Search Input */}
+        {/* Search Input Pill */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search issues, IDs, locations..."
-            className="w-full pl-9 pr-3 py-1.5 rounded-lg bg-black/30 border border-white/[0.06] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Search incident titles, IDs, rooms..."
+            className="w-full pl-10 pr-4 py-2 rounded-full bg-black/30 border border-white/10 text-xs text-white placeholder:text-slate-400 focus:outline-none focus:border-fuchsia-400 transition-colors"
           />
         </div>
 
-        {/* Dropdowns */}
+        {/* Filter Pills */}
         <div className="flex flex-wrap items-center gap-2">
           
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg bg-black/30 border border-white/[0.06] text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="px-4 py-2 rounded-full glass-pill text-xs text-slate-200 focus:outline-none focus:border-fuchsia-400 cursor-pointer font-medium"
           >
             {CATEGORIES.map(cat => (
-              <option key={cat} value={cat} className="bg-[#111622] text-slate-200">{cat}</option>
+              <option key={cat} value={cat} className="bg-[#111622] text-white">{cat}</option>
             ))}
           </select>
 
           <select
             value={selectedPriority}
             onChange={(e) => setSelectedPriority(e.target.value)}
-            className="px-2.5 py-1.5 rounded-lg bg-black/30 border border-white/[0.06] text-xs text-slate-300 focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="px-4 py-2 rounded-full glass-pill text-xs text-slate-200 focus:outline-none focus:border-fuchsia-400 cursor-pointer font-medium"
           >
             {PRIORITIES.map(p => (
-              <option key={p} value={p} className="bg-[#111622] text-slate-200">{p}</option>
+              <option key={p} value={p} className="bg-[#111622] text-white">{p}</option>
             ))}
           </select>
 
           <button
             onClick={onOpenReportModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-md shadow-white/20 active:scale-95"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4 text-slate-900" />
             <span>Create</span>
           </button>
 
         </div>
       </div>
 
-      {/* Status Segmented Control */}
-      <div className="flex items-center gap-1 border-b border-white/[0.06] pb-1 text-xs">
+      {/* Status Segmented Pill Filter */}
+      <div className="flex items-center gap-1.5 p-1 rounded-full glass-card border border-white/10 w-fit text-xs">
         {STATUSES.map(tab => (
           <button
             key={tab}
             onClick={() => setStatusTab(tab)}
-            className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
+            className={`px-4 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
               statusTab === tab 
-                ? 'bg-white/[0.08] text-white' 
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-white text-slate-900 shadow-md' 
+                : 'text-slate-300 hover:text-white hover:bg-white/[0.05]'
             }`}
           >
             {tab}
           </button>
         ))}
-        <span className="ml-auto text-[11px] text-slate-500 font-mono">
-          {filtered.length} issues found
+        <span className="px-3 text-[11px] text-slate-400 font-mono hidden sm:inline">
+          {filtered.length} issues
         </span>
       </div>
 
-      {/* Clean Table */}
-      <div className="rounded-xl bg-[#111622] border border-white/[0.08] overflow-hidden">
+      {/* Clean Frosted Glass Table */}
+      <div className="rounded-[28px] glass-card border border-white/15 overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-black/20 text-slate-400 text-[11px] uppercase tracking-wider border-b border-white/[0.06]">
+            <thead className="bg-white/[0.03] text-slate-400 text-[11px] uppercase tracking-wider border-b border-white/10 font-bold">
               <tr>
-                <th className="py-2.5 px-4 font-semibold">ID</th>
-                <th className="py-2.5 px-4 font-semibold">Title & Details</th>
-                <th className="py-2.5 px-4 font-semibold">Category</th>
-                <th className="py-2.5 px-4 font-semibold">Priority</th>
-                <th className="py-2.5 px-4 font-semibold">Location</th>
-                <th className="py-2.5 px-4 font-semibold">Status</th>
-                <th className="py-2.5 px-4 text-right"></th>
+                <th className="py-3 px-5">ID</th>
+                <th className="py-3 px-5">Incident Details</th>
+                <th className="py-3 px-5">Domain</th>
+                <th className="py-3 px-5">Urgency</th>
+                <th className="py-3 px-5">Location</th>
+                <th className="py-3 px-5">Lifecycle</th>
+                <th className="py-3 px-5 text-right"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-white/[0.06]">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-slate-500">
-                    No matching issues.
+                  <td colSpan={7} className="py-16 text-center text-slate-400 font-medium">
+                    No matching incidents found.
                   </td>
                 </tr>
               ) : (
@@ -173,36 +173,36 @@ export default function ComplaintsListView({
                   <tr
                     key={c._id || c.complaintId}
                     onClick={() => onSelectComplaint && onSelectComplaint(c)}
-                    className="hover:bg-white/[0.02] cursor-pointer transition-colors group"
+                    className="hover:bg-white/[0.04] cursor-pointer transition-colors group"
                   >
-                    <td className="py-3 px-4 font-mono text-[11px] text-slate-400 font-medium">
+                    <td className="py-4 px-5 font-mono text-[11px] text-fuchsia-300 font-semibold">
                       {c.complaintId}
                     </td>
-                    <td className="py-3 px-4 max-w-sm">
-                      <div className="font-medium text-slate-200 group-hover:text-blue-400 transition-colors truncate">
+                    <td className="py-4 px-5 max-w-sm">
+                      <div className="font-semibold text-white group-hover:text-fuchsia-300 transition-colors truncate">
                         {c.title}
                       </div>
-                      <div className="text-[11px] text-slate-500 truncate mt-0.5">
+                      <div className="text-[11px] text-slate-400 truncate mt-0.5">
                         {c.description}
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-slate-300">
+                    <td className="py-4 px-5 text-slate-300 font-medium">
                       {c.category}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-block text-[10px] font-mono px-2 py-0.5 rounded border ${getPriorityStyle(c.priority)}`}>
+                    <td className="py-4 px-5">
+                      <span className={`inline-block text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full border ${getPriorityStyle(c.priority)}`}>
                         {c.priority}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-400 truncate max-w-[160px]">
+                    <td className="py-4 px-5 text-slate-300 truncate max-w-[170px]">
                       {c.location?.facilityName || c.location?.building || 'Main Campus'}
                     </td>
-                    <td className="py-3 px-4">
-                      <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full border ${getStatusStyle(c.status)}`}>
+                    <td className="py-4 px-5">
+                      <span className={`inline-block text-[10px] font-medium px-2.5 py-0.5 rounded-full border ${getStatusStyle(c.status)}`}>
                         {c.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right text-slate-600 group-hover:text-slate-300 transition-colors">
+                    <td className="py-4 px-5 text-right text-slate-500 group-hover:text-white transition-colors">
                       <ChevronRight className="w-4 h-4 ml-auto" />
                     </td>
                   </tr>

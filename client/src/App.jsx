@@ -101,36 +101,71 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col font-sans">
+    <div className="relative min-h-screen bg-[#07080B] text-slate-100 flex flex-col font-sans selection:bg-fuchsia-500 selection:text-white overflow-hidden">
+      
+      {/* 🌟 Radiant Bold Ambient Gradient Mesh Background (Matching Inspiration Image) */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Giant Top-Right Aurora Orb */}
+        <div 
+          className="absolute -top-[10%] -right-[15%] w-[850px] h-[850px] rounded-full opacity-60 filter blur-[120px] animate-mesh-float"
+          style={{
+            background: 'radial-gradient(circle, rgba(244,114,182,0.85) 0%, rgba(192,132,252,0.8) 35%, rgba(99,102,241,0.6) 65%, rgba(56,189,248,0) 80%)'
+          }}
+        />
+
+        {/* Warm Peachy-Coral Center Glow */}
+        <div 
+          className="absolute top-[25%] left-[20%] w-[650px] h-[650px] rounded-full opacity-40 filter blur-[130px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(251,146,60,0.6) 0%, rgba(244,63,94,0.5) 45%, rgba(168,85,247,0) 75%)'
+          }}
+        />
+
+        {/* Deep Violet / Indigo Base Glow */}
+        <div 
+          className="absolute -bottom-[20%] -left-[10%] w-[750px] h-[750px] rounded-full opacity-50 filter blur-[140px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(99,102,241,0.7) 0%, rgba(139,92,246,0.6) 40%, rgba(14,165,233,0) 80%)'
+          }}
+        />
+
+        {/* Subtle noise texture overlay for organic analog depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+      </div>
+
       {/* Toast notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#111622] border border-white/[0.1] text-slate-200 text-xs shadow-2xl">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-full glass-card border border-white/20 text-white text-xs shadow-2xl backdrop-blur-2xl">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{toastMessage.msg}</span>
+          <span className="font-medium tracking-wide">{toastMessage.msg}</span>
         </div>
       )}
 
-      {/* Navigation Header */}
-      <Navbar
-        currentRole={currentRole}
-        setCurrentRole={(role) => {
-          setCurrentRole(role);
-          if (role === 'technician') setActiveTab('complaints');
-          showToast(`Switched view to ${role.toUpperCase()}`);
-        }}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenReportModal={() => setIsReportModalOpen(true)}
-        onOpenDocsModal={() => setIsDocsModalOpen(true)}
-      />
+      {/* Floating Glass Navigation Header */}
+      <div className="relative z-40">
+        <Navbar
+          currentRole={currentRole}
+          setCurrentRole={(role) => {
+            setCurrentRole(role);
+            if (role === 'technician') setActiveTab('complaints');
+            showToast(`Switched view to ${role.toUpperCase()}`);
+          }}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onOpenReportModal={() => setIsReportModalOpen(true)}
+          onOpenDocsModal={() => setIsDocsModalOpen(true)}
+        />
+      </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8">
         {loading ? (
-          <div className="h-80 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
-            <p className="text-xs text-slate-500">
-              Loading operational metrics...
+          <div className="h-96 flex flex-col items-center justify-center gap-4">
+            <div className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center">
+              <Loader2 className="w-6 h-6 text-fuchsia-400 animate-spin" />
+            </div>
+            <p className="text-xs text-slate-400 font-medium tracking-wide">
+              Initializing CampusOps Intelligence...
             </p>
           </div>
         ) : (
@@ -144,6 +179,7 @@ export default function App() {
                 onSelectComplaint={(c) => setSelectedComplaint(c)}
                 onRefresh={fetchData}
                 onOpenReportModal={() => setIsReportModalOpen(true)}
+                onOpenPredictive={() => setActiveTab('predictive')}
               />
             )}
 
@@ -170,13 +206,18 @@ export default function App() {
         )}
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#090D14] py-4 px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full">
-        <div className="text-[11px] text-slate-400 font-medium">
-          CampusOps • Facility & Infrastructure Intelligence
-        </div>
-        <div className="text-[11px] text-slate-600 mt-1 sm:mt-0">
-          Jagan Institute of Management Studies (JIMS Rohini) • Varun Malik, Shankar Sumar & Aditya
+      {/* Frosted Glass Minimal Footer */}
+      <footer className="relative z-10 border-t border-white/[0.08] bg-black/20 backdrop-blur-xl py-6 px-4 text-xs text-slate-400">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-semibold text-slate-200 tracking-tight">CampusOps</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-slate-400">Predictive Facility Management</span>
+          </div>
+          <div className="text-[11px] text-slate-400">
+            Jagan Institute of Management Studies (JIMS Rohini) • MCA Academic Project
+          </div>
         </div>
       </footer>
 
