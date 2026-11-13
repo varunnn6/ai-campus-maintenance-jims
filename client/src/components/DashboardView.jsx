@@ -90,14 +90,14 @@ export default function DashboardView({
             <span>Autonomous Facility Intelligence</span>
           </div>
 
-          {/* Bold Headline */}
+          {/* Intelligent Headline */}
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1]">
-            Bold Gradients. <br />
-            <span className="gradient-text-aura">Clean Operations.</span>
+            Predictive Operations. <br />
+            <span className="gradient-text-aura">Zero Downtime.</span>
           </h1>
 
           <p className="text-sm sm:text-base text-slate-300 font-normal leading-relaxed max-w-lg">
-            Next-generation campus asset maintenance platform with continuous Poisson MTBF failure forecasting and multi-modal computer vision fault triage.
+            Transitioning campus facilities from reactive reporting to proactive, data-driven management through real-time ML risk scoring and automated defect triage.
           </p>
 
           {/* Action Pills */}
