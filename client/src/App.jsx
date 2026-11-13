@@ -9,12 +9,7 @@ import ReportIssueModal from './components/ReportIssueModal.jsx';
 import ComplaintDetailModal from './components/ComplaintDetailModal.jsx';
 import DocumentationModal from './components/DocumentationModal.jsx';
 import { 
-  Building2, 
-  Sparkles, 
-  Wrench, 
   CheckCircle2, 
-  AlertCircle, 
-  Heart,
   Loader2 
 } from 'lucide-react';
 
@@ -58,22 +53,22 @@ export default function App() {
         facData,
         techData
       ] = await Promise.all([
-        apiRequest('/complaints'),
-        apiRequest('/analytics/summary'),
-        apiRequest('/analytics/trends'),
-        apiRequest('/analytics/risk-heatmap'),
-        apiRequest('/analytics/recurring'),
-        apiRequest('/facilities'),
-        apiRequest('/auth/technicians')
+        apiRequest('/complaints').catch(() => []),
+        apiRequest('/analytics/summary').catch(() => null),
+        apiRequest('/analytics/trends').catch(() => []),
+        apiRequest('/analytics/risk-heatmap').catch(() => []),
+        apiRequest('/analytics/recurring').catch(() => []),
+        apiRequest('/facilities').catch(() => []),
+        apiRequest('/auth/technicians').catch(() => [])
       ]);
 
-      if (compData) setComplaints(compData);
+      if (compData && Array.isArray(compData)) setComplaints(compData);
       if (sumData) setSummary(sumData);
-      if (trendResData) setTrendData(trendResData);
-      if (riskData) setRiskHeatmap(riskData);
-      if (recurData) setRecurringClusters(recurData);
-      if (facData) setFacilities(facData);
-      if (techData) setTechnicians(techData);
+      if (trendResData && Array.isArray(trendResData)) setTrendData(trendResData);
+      if (riskData && Array.isArray(riskData)) setRiskHeatmap(riskData);
+      if (recurData && Array.isArray(recurData)) setRecurringClusters(recurData);
+      if (facData && Array.isArray(facData)) setFacilities(facData);
+      if (techData && Array.isArray(techData)) setTechnicians(techData);
     } catch (err) {
       console.error('Data fetch error:', err);
     } finally {
@@ -87,7 +82,7 @@ export default function App() {
 
   const handleComplaintCreated = (newComplaint) => {
     setComplaints(prev => [newComplaint, ...prev]);
-    showToast(`Complaint ${newComplaint.complaintId} created & dispatched successfully!`);
+    showToast(`Issue ${newComplaint.complaintId} created & dispatched successfully`);
     fetchData();
   };
 
@@ -96,20 +91,20 @@ export default function App() {
       (c._id === updatedComplaint._id || c.complaintId === updatedComplaint.complaintId) ? updatedComplaint : c
     ));
     setSelectedComplaint(updatedComplaint);
-    showToast(`Complaint status updated to ${updatedComplaint.status}!`);
+    showToast(`Status updated to ${updatedComplaint.status}`);
     fetchData();
   };
 
   const handleGenerateWorkOrder = (cluster) => {
     setIsReportModalOpen(true);
-    showToast(`Pre-emptive maintenance template loaded for ${cluster.building} ${cluster.room}!`);
+    showToast(`Pre-emptive order template loaded for ${cluster.building} ${cluster.room}`);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div className="min-h-screen bg-[#0B0F17] text-slate-100 flex flex-col font-sans">
       {/* Toast notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 text-xs shadow-2xl animate-bounce">
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#111622] border border-white/[0.1] text-slate-200 text-xs shadow-2xl">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{toastMessage.msg}</span>
         </div>
@@ -121,7 +116,7 @@ export default function App() {
         setCurrentRole={(role) => {
           setCurrentRole(role);
           if (role === 'technician') setActiveTab('complaints');
-          showToast(`Switched active view role to ${role.toUpperCase()}`);
+          showToast(`Switched view to ${role.toUpperCase()}`);
         }}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -132,10 +127,10 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
         {loading ? (
-          <div className="h-96 flex flex-col items-center justify-center gap-3">
-            <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <p className="text-xs text-slate-400 font-medium">
-              Connecting to JIMS Campus Maintenance Engine & Neural Models...
+          <div className="h-80 flex flex-col items-center justify-center gap-3">
+            <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+            <p className="text-xs text-slate-500">
+              Loading operational metrics...
             </p>
           </div>
         ) : (
@@ -171,26 +166,18 @@ export default function App() {
             {activeTab === 'facilities' && (
               <FacilityDirectoryView facilities={facilities} />
             )}
-
-            {activeTab === 'technician' && (
-              <ComplaintsListView
-                complaints={complaints.filter(c => c.status !== 'Resolved' && c.status !== 'Closed')}
-                onSelectComplaint={(c) => setSelectedComplaint(c)}
-                onOpenReportModal={() => setIsReportModalOpen(true)}
-              />
-            )}
           </>
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-5 px-4 text-center text-xs text-slate-500 space-y-1">
-        <p className="font-medium text-slate-400">
-          Jagan Institute of Management Studies (JIMS), Sector-5, Rohini, Delhi – 110085
-        </p>
-        <p className="text-[11px] text-slate-600">
-          MCA Semester 3 Academic Project by <strong>Varun Malik, Shankar Sumar & Aditya</strong> • Affiliated to GGSIPU
-        </p>
+      {/* Minimal Footer */}
+      <footer className="border-t border-white/[0.06] bg-[#090D14] py-4 px-4 text-center text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between max-w-7xl mx-auto w-full">
+        <div className="text-[11px] text-slate-400 font-medium">
+          CampusOps • Facility & Infrastructure Intelligence
+        </div>
+        <div className="text-[11px] text-slate-600 mt-1 sm:mt-0">
+          Jagan Institute of Management Studies (JIMS Rohini) • Varun Malik, Shankar Sumar & Aditya
+        </div>
       </footer>
 
       {/* Modals */}

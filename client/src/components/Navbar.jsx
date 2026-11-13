@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Building2, 
-  Cpu, 
-  Wrench, 
-  AlertTriangle, 
-  PlusCircle, 
-  BarChart3, 
-  ListFilter, 
-  Zap, 
-  BookOpen, 
-  ShieldCheck, 
-  UserCheck
+  Plus, 
+  Layers, 
+  AlertCircle, 
+  Activity, 
+  FileText, 
+  ChevronDown,
+  User,
+  Check
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -19,164 +17,157 @@ export default function Navbar({
   activeTab, 
   setActiveTab, 
   onOpenReportModal, 
-  onOpenDocsModal,
-  systemStatus 
+  onOpenDocsModal 
 }) {
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+
   const roles = [
-    { id: 'admin', label: 'Admin (Dr. Sharma)', badge: 'Admin', color: 'bg-purple-600 text-purple-100' },
-    { id: 'student', label: 'Student (Varun)', badge: 'Student', color: 'bg-blue-600 text-blue-100' },
-    { id: 'staff', label: 'Faculty (Prof. Shankar)', badge: 'Staff', color: 'bg-emerald-600 text-emerald-100' },
-    { id: 'technician', label: 'Technician (Rajesh)', badge: 'Tech', color: 'bg-amber-600 text-amber-100' }
+    { id: 'admin', label: 'Administrator', sub: 'Dr. R. K. Sharma' },
+    { id: 'student', label: 'Student', sub: 'Varun Malik (MCA)' },
+    { id: 'staff', label: 'Faculty & Staff', sub: 'Prof. Shankar Sumar' },
+    { id: 'technician', label: 'Technician', sub: 'Rajesh Kumar (HVAC)' }
+  ];
+
+  const currentRoleObj = roles.find(r => r.id === currentRole) || roles[0];
+
+  const navItems = [
+    { id: 'dashboard', label: 'Overview', icon: Layers },
+    { id: 'complaints', label: 'Issues', icon: AlertCircle },
+    { id: 'predictive', label: 'Predictive Risk', icon: Activity },
+    { id: 'facilities', label: 'Facilities', icon: Building2 },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-      {/* Top institution bar */}
-      <div className="bg-slate-950 px-4 py-1.5 border-b border-slate-800/60 text-xs text-slate-400 flex flex-wrap items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-semibold text-blue-400 tracking-wide">JAGAN INSTITUTE OF MANAGEMENT STUDIES (JIMS)</span>
-          <span className="hidden sm:inline text-slate-600">|</span>
-          <span className="hidden sm:inline">Sector-5, Rohini, Delhi – 110085 (GGSIPU Affiliated)</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-slate-300">API: <strong className="text-emerald-400 font-mono">Port 5005</strong></span>
-          </div>
-          <span className="text-slate-600">•</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-            <span className="text-slate-300">AI Engine: <strong className="text-blue-400 font-mono">Port 5001</strong></span>
-          </div>
-          <span className="text-slate-600">•</span>
-          <button 
-            onClick={onOpenDocsModal}
-            className="flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors font-medium cursor-pointer"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Project Synopsis & Viva Docs</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Main navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Logo & title */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 text-white font-bold text-xl">
-              <Building2 className="w-6 h-6" />
+    <header className="sticky top-0 z-40 bg-[#0B0F17]/85 backdrop-blur-md border-b border-white/[0.08]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        
+        {/* Brand */}
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
+            <div className="w-8 h-8 rounded-lg bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white">
+              <Building2 className="w-4 h-4 text-blue-400" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white tracking-tight">AI-Driven Predictive Campus Maintenance</h1>
-                <span className="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  MCA Sem 3
-                </span>
-              </div>
-              <p className="text-xs text-slate-400">
-                Facility Management & Machine Learning Failure Forecasting System
-              </p>
+              <span className="font-semibold text-sm tracking-tight text-white">CampusOps</span>
+              <span className="hidden sm:inline-block ml-2 text-[11px] text-slate-500 font-normal">
+                Facility Intelligence
+              </span>
             </div>
           </div>
 
-          {/* Quick role switcher */}
-          <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-xl border border-slate-800">
-            <span className="text-[11px] font-medium text-slate-400 px-2 flex items-center gap-1">
-              <UserCheck className="w-3.5 h-3.5 text-blue-400" />
-              Role:
-            </span>
-            <div className="flex items-center gap-1">
-              {roles.map(r => (
+          {/* Navigation Tabs */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navItems.map(item => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
                 <button
-                  key={r.id}
-                  onClick={() => setCurrentRole(r.id)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all ${
-                    currentRole === r.id
-                      ? `${r.color} shadow-sm font-semibold`
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
+                    isActive 
+                      ? 'bg-white/[0.08] text-white' 
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
                   }`}
                 >
-                  {r.badge}
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                  <span>{item.label}</span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2.5">
+          {/* Docs button */}
+          <button
+            onClick={onOpenDocsModal}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-colors cursor-pointer border border-transparent hover:border-white/[0.06]"
+            title="Project Documentation & Architecture"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Docs</span>
+          </button>
+
+          {/* Role selector dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setRoleMenuOpen(!roleMenuOpen)}
+              className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.08] text-xs font-medium text-slate-200 transition-colors cursor-pointer"
+            >
+              <div className="w-5 h-5 rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center text-[10px] font-bold">
+                {currentRoleObj.label[0]}
+              </div>
+              <span className="hidden sm:inline text-slate-300">{currentRoleObj.label}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+
+            {roleMenuOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setRoleMenuOpen(false)} 
+                />
+                <div className="absolute right-0 mt-2 w-56 rounded-xl bg-[#111622] border border-white/[0.1] shadow-2xl p-1.5 z-50 space-y-0.5">
+                  <div className="px-2.5 py-1.5 text-[10px] uppercase font-semibold tracking-wider text-slate-500">
+                    Switch Perspective
+                  </div>
+                  {roles.map(r => (
+                    <button
+                      key={r.id}
+                      onClick={() => {
+                        setCurrentRole(r.id);
+                        setRoleMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
+                        currentRole === r.id 
+                          ? 'bg-blue-600/10 text-blue-400 font-medium' 
+                          : 'text-slate-300 hover:bg-white/[0.05]'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-slate-200 font-medium">{r.label}</div>
+                        <div className="text-[11px] text-slate-500">{r.sub}</div>
+                      </div>
+                      {currentRole === r.id && <Check className="w-3.5 h-3.5 text-blue-400" />}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Report Issue CTA Button */}
+          {/* New Issue Button */}
           <button
             onClick={onOpenReportModal}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs shadow-lg shadow-blue-600/25 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-colors cursor-pointer shadow-sm shadow-blue-600/20"
           >
-            <PlusCircle className="w-4 h-4" />
-            <span>Report Issue (AI Triage)</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Report Issue</span>
           </button>
         </div>
 
-        {/* Tab navigation bar */}
-        <div className="flex items-center gap-1 mt-3 pt-2 border-t border-slate-800/80 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'dashboard'
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>Executive Dashboard</span>
-          </button>
+      </div>
 
-          <button
-            onClick={() => setActiveTab('complaints')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'complaints'
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <ListFilter className="w-3.5 h-3.5" />
-            <span>Complaints & Lifecycle Tracking</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('predictive')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'predictive'
-                ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30 font-semibold'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Zap className="w-3.5 h-3.5 text-purple-400" />
-            <span>AI Predictive Maintenance & Heatmap</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('facilities')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-              activeTab === 'facilities'
-                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 font-semibold'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5" />
-            <span>Campus Facilities & Assets</span>
-          </button>
-
-          {currentRole === 'technician' && (
+      {/* Mobile nav strip */}
+      <div className="md:hidden flex items-center justify-around border-t border-white/[0.05] px-2 py-1.5 bg-[#0B0F17]">
+        {navItems.map(item => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
             <button
-              onClick={() => setActiveTab('technician')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer whitespace-nowrap ${
-                activeTab === 'technician'
-                  ? 'bg-amber-600/20 text-amber-400 border border-amber-500/30 font-semibold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`flex flex-col items-center gap-1 py-1 px-3 text-[10px] font-medium transition-colors ${
+                isActive ? 'text-blue-400' : 'text-slate-500'
               }`}
             >
-              <Wrench className="w-3.5 h-3.5 text-amber-400" />
-              <span>Technician Work Orders</span>
+              <Icon className="w-4 h-4" />
+              <span>{item.label}</span>
             </button>
-          )}
-        </div>
+          );
+        })}
       </div>
     </header>
   );
