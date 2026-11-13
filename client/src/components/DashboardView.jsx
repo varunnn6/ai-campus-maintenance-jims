@@ -71,7 +71,7 @@ export default function DashboardView({
   return (
     <div className="space-y-8">
       
-      {/* 🌟 HERO SECTION: Matching the "Bold Gradients. Clean UI." Inspiration Style */}
+      {/* 🌟 HERO EXECUTIVE BANNER */}
       <div className="relative rounded-[32px] overflow-hidden glass-card border border-white/20 p-8 sm:p-12 shadow-[0_25px_60px_rgba(0,0,0,0.4)]">
         
         {/* Internal lush gradient orb inside the hero */}

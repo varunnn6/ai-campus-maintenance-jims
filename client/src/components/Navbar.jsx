@@ -5,15 +5,15 @@ import {
   Layers, 
   AlertCircle, 
   Activity, 
-  FileText, 
   ChevronDown,
   Sparkles,
   Check,
-  Wrench,
-  User,
-  ListTodo,
-  Inbox,
-  LogOut
+  Wrench, 
+  User, 
+  ListTodo, 
+  Inbox, 
+  LogOut,
+  UserPlus
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -23,68 +23,42 @@ export default function Navbar({
   onLogout,
   activeTab, 
   setActiveTab, 
-  onOpenReportModal, 
-  onOpenDocsModal 
+  onOpenReportModal,
+  onOpenAddUserModal
 }) {
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
 
-  const roles = [
-    { 
-      id: 'student', 
-      label: 'Student', 
-      name: 'Varun Malik', 
-      tag: 'MCA Sem 3',
-      color: 'from-blue-500 to-indigo-600'
-    },
-    { 
-      id: 'staff', 
-      label: 'Faculty & Staff', 
-      name: 'Prof. Shankar Sumar', 
-      tag: 'MCA Department',
-      color: 'from-emerald-500 to-teal-600'
-    },
-    { 
-      id: 'technician', 
-      label: 'Field Technician', 
-      name: 'Rajesh Kumar', 
-      tag: 'Sr. HVAC & Electrical',
-      color: 'from-amber-500 to-orange-600'
-    },
-    { 
-      id: 'admin', 
-      label: 'Administrator', 
-      name: 'Dr. R. K. Sharma', 
-      tag: 'Facility Director',
-      color: 'from-purple-500 to-pink-600'
-    }
-  ];
+  const roleLabels = {
+    student: { label: 'Student', color: 'from-blue-500 to-indigo-600' },
+    staff: { label: 'Faculty & Staff', color: 'from-emerald-500 to-teal-600' },
+    technician: { label: 'Field Technician', color: 'from-amber-500 to-orange-600' },
+    admin: { label: 'Administrator', color: 'from-purple-500 to-pink-600' }
+  };
 
-  const currentRoleObj = roles.find(r => r.id === currentRole) || roles[0];
-  const displayName = currentUser?.name || currentRoleObj.name;
+  const currentRoleConfig = roleLabels[currentRole] || roleLabels.student;
+  const displayName = currentUser?.name || currentRoleConfig.label;
 
-  // Dynamic Navigation Items Tailored Specifically to Role Capabilities
+  // Dynamic Navigation Items Tailored Specifically to Role Capabilities (No synopsis, no facility directory)
   const getNavItems = () => {
     switch (currentRole) {
       case 'student':
       case 'staff':
         return [
           { id: 'my-requests', label: 'My Submissions', icon: Inbox },
-          { id: 'all-issues', label: 'Campus Feed', icon: AlertCircle },
-          { id: 'facilities', label: 'Facility Directory', icon: Building2 },
+          { id: 'all-issues', label: 'Campus Feed', icon: AlertCircle }
         ];
       case 'technician':
         return [
           { id: 'tech-assigned', label: 'My Work Orders', icon: Wrench },
-          { id: 'tech-queue', label: 'Open Campus Queue', icon: ListTodo },
-          { id: 'tech-completed', label: 'Completed Repairs', icon: Layers },
+          { id: 'tech-queue', label: 'Open Campus Pool', icon: ListTodo },
+          { id: 'tech-completed', label: 'Completed Repairs', icon: Layers }
         ];
       case 'admin':
       default:
         return [
           { id: 'dashboard', label: 'Executive Overview', icon: Layers },
           { id: 'complaints', label: 'Dispatch & Incidents', icon: AlertCircle },
-          { id: 'predictive', label: 'Predictive Radar', icon: Activity },
-          { id: 'facilities', label: 'Campus Facilities', icon: Building2 },
+          { id: 'predictive', label: 'Predictive Radar', icon: Activity }
         ];
     }
   };
@@ -112,7 +86,7 @@ export default function Navbar({
           <div>
             <span className="font-bold text-xs sm:text-sm tracking-tight text-white block">CampusOps</span>
             <span className="hidden sm:block text-[10px] text-slate-400 font-medium tracking-wide">
-              {currentRoleObj.label} Mode
+              {currentRoleConfig.label}
             </span>
           </div>
         </div>
@@ -142,26 +116,27 @@ export default function Navbar({
         {/* Right Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
-          {/* Docs Pill */}
-          <button
-            onClick={onOpenDocsModal}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-xs font-medium text-slate-300 hover:text-white transition-colors cursor-pointer"
-            title="Academic Project Synopsis & Architecture"
-          >
-            <FileText className="w-3.5 h-3.5 text-fuchsia-400" />
-            <span>Synopsis</span>
-          </button>
+          {/* Admin Add Member Button */}
+          {currentRole === 'admin' && onOpenAddUserModal && (
+            <button
+              onClick={onOpenAddUserModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-fuchsia-300 hover:text-white border-fuchsia-500/30 transition-colors cursor-pointer"
+              title="Add New Student, Worker or Faculty"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-fuchsia-400" />
+              <span className="hidden sm:inline">Add Member</span>
+            </button>
+          )}
 
-          {/* Role Switcher Pill */}
+          {/* User Profile Pill & Switcher */}
           <div className="relative">
             <button
               onClick={() => setRoleMenuOpen(!roleMenuOpen)}
               className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer"
             >
-              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${currentRoleObj.color} animate-pulse shrink-0`} />
-              <div className="text-left truncate max-w-[100px] sm:max-w-none">
-                <span className="hidden sm:inline">{displayName}</span>
-                <span className="sm:hidden">{currentRoleObj.label}</span>
+              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${currentRoleConfig.color} animate-pulse shrink-0`} />
+              <div className="text-left truncate max-w-[110px] sm:max-w-none">
+                <span className="truncate block font-medium">{displayName}</span>
               </div>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             </button>
@@ -172,11 +147,26 @@ export default function Navbar({
                   className="fixed inset-0 z-40" 
                   onClick={() => setRoleMenuOpen(false)} 
                 />
-                <div className="absolute right-0 mt-3 w-64 rounded-2xl glass-card border border-white/20 shadow-2xl p-2 z-50 space-y-1 backdrop-blur-2xl">
-                  <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Switch User Role
+                <div className="absolute right-0 mt-3 w-64 rounded-2xl glass-card border border-white/20 shadow-2xl p-2.5 z-50 space-y-1.5 backdrop-blur-2xl">
+                  
+                  {/* Current User Card */}
+                  <div className="px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+                    <div className="text-xs font-bold text-white truncate">{displayName}</div>
+                    <div className="text-[10px] text-fuchsia-400 font-mono">
+                      {currentUser?.enrollmentNumber || currentUser?.department || currentRoleConfig.label}
+                    </div>
                   </div>
-                  {roles.map(r => (
+
+                  <div className="px-2 pt-1 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                    Switch Active Mode
+                  </div>
+
+                  {[
+                    { id: 'student', label: 'Student Mode', desc: 'Submit & Track Requests' },
+                    { id: 'staff', label: 'Faculty & Staff', desc: 'Departmental Requests' },
+                    { id: 'technician', label: 'Field Technician', desc: 'Accept Jobs & Proofs' },
+                    { id: 'admin', label: 'Administrator', desc: 'Campus Oversight & Members' }
+                  ].map(r => (
                     <button
                       key={r.id}
                       onClick={() => {
@@ -193,13 +183,8 @@ export default function Navbar({
                       }`}
                     >
                       <div>
-                        <div className="text-white font-semibold flex items-center gap-2">
-                          <span>{r.name}</span>
-                          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white/10 text-slate-300">
-                            {r.label}
-                          </span>
-                        </div>
-                        <div className="text-[11px] text-slate-400">{r.tag}</div>
+                        <div className="text-white font-semibold">{r.label}</div>
+                        <div className="text-[10px] text-slate-400">{r.desc}</div>
                       </div>
                       {currentRole === r.id && <Check className="w-3.5 h-3.5 text-fuchsia-400" />}
                     </button>
@@ -207,7 +192,7 @@ export default function Navbar({
                   
                   {/* Logout item */}
                   {onLogout && (
-                    <div className="pt-1 border-t border-white/10">
+                    <div className="pt-1.5 border-t border-white/10">
                       <button
                         onClick={() => {
                           setRoleMenuOpen(false);
@@ -229,7 +214,7 @@ export default function Navbar({
           {(currentRole === 'student' || currentRole === 'staff' || currentRole === 'admin') && (
             <button
               onClick={onOpenReportModal}
-              className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-lg shadow-white/20 active:scale-95 shrink-0"
+              className="flex items-center gap-1 sm:gap-1.5 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-lg shadow-white/20 active:scale-95 shrink-0"
             >
               <Plus className="w-3.5 h-3.5 text-slate-900" />
               <span className="hidden sm:inline">Report Issue</span>
@@ -237,7 +222,7 @@ export default function Navbar({
             </button>
           )}
 
-          {/* Logout button */}
+          {/* Quick Sign Out icon */}
           {onLogout && (
             <button
               onClick={onLogout}
@@ -261,12 +246,14 @@ export default function Navbar({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold transition-all ${
-                isActive ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                isActive 
+                  ? 'bg-white text-slate-900 shadow-sm' 
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
-              <span>{item.label}</span>
+              <span className="truncate">{item.label}</span>
             </button>
           );
         })}

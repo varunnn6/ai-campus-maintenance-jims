@@ -1,5 +1,23 @@
 import { Complaint, Facility, ActivityLog, User } from '../models/index.js';
 
+// Trade mapping for automated AI dispatch
+const mapCategoryToTrade = (category = '') => {
+  const cat = category.toLowerCase();
+  if (cat.includes('electrical') || cat.includes('power') || cat.includes('hvac') || cat.includes('ac')) {
+    return 'Electrical & HVAC';
+  }
+  if (cat.includes('plumb') || cat.includes('water') || cat.includes('sanitat') || cat.includes('washroom') || cat.includes('hygiene')) {
+    return 'Plumbing & Sanitation';
+  }
+  if (cat.includes('civil') || cat.includes('furniture') || cat.includes('door') || cat.includes('window') || cat.includes('carpentry')) {
+    return 'Civil & Carpentry';
+  }
+  if (cat.includes('it') || cat.includes('computer') || cat.includes('lab') || cat.includes('network') || cat.includes('hardware') || cat.includes('projector')) {
+    return 'IT & Networking';
+  }
+  return 'General Maintenance';
+};
+
 // Sequential complaint ID generator
 const generateComplaintId = async () => {
   const count = await Complaint.countDocuments();
@@ -26,6 +44,9 @@ export const createComplaint = async (req, res) => {
     }
 
     const complaintId = await generateComplaintId();
+    const finalCategory = category || aiClassification?.category || 'Civil & Furniture';
+    const targetTrade = mapCategoryToTrade(finalCategory);
+
     const reporter = req.user || {
       _id: 'guest',
       name: 'Campus User',
@@ -37,13 +58,16 @@ export const createComplaint = async (req, res) => {
       complaintId,
       title,
       description,
-      category: category || aiClassification?.category || 'Civil & Furniture',
+      category: finalCategory,
       priority: priority || aiPriority?.priority || 'Medium',
       status: 'Submitted',
+      targetTrade,
+      aiAutoDispatched: true,
+      optInAvailable: true,
       location: {
         facilityId: location?.facilityId || '',
         facilityName: location?.facilityName || location?.building || 'Main Campus',
-        building: location?.building || 'Block B',
+        building: location?.building || 'Building B',
         floor: location?.floor || '1st Floor',
         room: location?.room || 'Room 101',
         specificAsset: location?.specificAsset || ''
@@ -60,7 +84,7 @@ export const createComplaint = async (req, res) => {
       cvAnalysis: cvAnalysis || null,
       history: [{
         status: 'Submitted',
-        note: 'Complaint submitted by user via web portal',
+        note: `Issue reported and AI auto-routed to ${targetTrade} technicians`,
         updatedBy: reporter.name,
         timestamp: new Date()
       }]
@@ -144,8 +168,17 @@ export const getComplaintById = async (req, res) => {
 export const updateStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, note } = req.body;
-    const updater = req.user ? req.user.name : 'System Administrator';
+    const { 
+      status, 
+      note, 
+      resolutionPhotos, 
+      resolutionNotes, 
+      partsReplaced, 
+      timeSpent, 
+      technicianName, 
+      technicianId 
+    } = req.body;
+    const updater = req.user ? req.user.name : (technicianName || 'System Administrator');
 
     const validStatuses = ['Submitted', 'Verified', 'Assigned', 'In Progress', 'Resolved', 'Closed'];
     if (!validStatuses.includes(status)) {
@@ -159,13 +192,39 @@ export const updateStatus = async (req, res) => {
 
     const historyEntry = {
       status,
-      note: note || `Status transitioned to ${status}`,
+      note: note || resolutionNotes || `Status updated to ${status}`,
       updatedBy: updater,
       timestamp: new Date()
     };
 
+    const updateFields = {
+      status,
+      updatedAt: new Date()
+    };
+
+    if (resolutionNotes) updateFields.resolutionNotes = resolutionNotes;
+    if (resolutionPhotos && Array.isArray(resolutionPhotos) && resolutionPhotos.length > 0) {
+      updateFields.resolutionPhotos = resolutionPhotos;
+    }
+    if (partsReplaced) updateFields.partsReplaced = partsReplaced;
+    if (timeSpent) updateFields.timeSpent = timeSpent;
+
+    if (technicianName && (status === 'In Progress' || status === 'Assigned' || status === 'Resolved')) {
+      updateFields.assignedTo = {
+        id: technicianId || (req.user ? req.user._id : 'tech'),
+        name: technicianName,
+        assignedAt: new Date()
+      };
+      updateFields.optInAvailable = false;
+    }
+
+    if (status === 'Resolved' || status === 'Closed') {
+      updateFields.resolvedAt = new Date();
+      updateFields.resolvedBy = updater;
+    }
+
     const updated = await Complaint.findByIdAndUpdate(id, {
-      $set: { status, updatedAt: new Date() },
+      $set: updateFields,
       $push: { history: historyEntry }
     });
 

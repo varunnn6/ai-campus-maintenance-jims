@@ -5,12 +5,11 @@ import LoginView from './components/LoginView.jsx';
 import DashboardView from './components/DashboardView.jsx';
 import ComplaintsListView from './components/ComplaintsListView.jsx';
 import PredictiveMaintenanceHub from './components/PredictiveMaintenanceHub.jsx';
-import FacilityDirectoryView from './components/FacilityDirectoryView.jsx';
 import StudentPortalView from './components/StudentPortalView.jsx';
 import TechnicianPortalView from './components/TechnicianPortalView.jsx';
 import ReportIssueModal from './components/ReportIssueModal.jsx';
 import ComplaintDetailModal from './components/ComplaintDetailModal.jsx';
-import DocumentationModal from './components/DocumentationModal.jsx';
+import AdminUserManagementModal from './components/AdminUserManagementModal.jsx';
 import { 
   CheckCircle2, 
   Loader2 
@@ -54,7 +53,7 @@ export default function App() {
 
   // Modals
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isDocsModalOpen, setIsDocsModalOpen] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   // Toast notification
@@ -125,14 +124,12 @@ export default function App() {
     setCurrentRole(role);
     if (role === 'student' || role === 'staff') {
       setActiveTab('my-requests');
-      showToast(`Switched to ${role === 'student' ? 'Varun Malik (Student)' : 'Prof. Shankar Sumar (Faculty)'}`);
     } else if (role === 'technician') {
       setActiveTab('tech-assigned');
-      showToast(`Switched to Rajesh Kumar (Field Technician)`);
     } else {
       setActiveTab('dashboard');
-      showToast(`Switched to Dr. R. K. Sharma (Administrator)`);
     }
+    showToast(`Switched active mode to ${role.toUpperCase()}`);
   };
 
   const handleComplaintCreated = (newComplaint) => {
@@ -144,6 +141,11 @@ export default function App() {
   const handleFacilityAdded = (newFacility) => {
     setFacilities(prev => [newFacility, ...prev]);
     showToast(`New room ${newFacility.roomNumber} (${newFacility.block}) saved to directory!`);
+  };
+
+  const handleUserAdded = (newUser) => {
+    showToast(`${newUser.role.toUpperCase()} "${newUser.name}" saved to Firebase!`);
+    fetchData();
   };
 
   const handleStatusUpdated = (updatedComplaint) => {
@@ -168,29 +170,29 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-[#07080B] text-slate-100 flex flex-col font-sans selection:bg-fuchsia-500 selection:text-white overflow-hidden">
       
-      {/* 🌟 Radiant Bold Ambient Gradient Mesh Background */}
+      {/* 🌟 Radiant Soft Ambient Aurora Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Giant Top-Right Aurora Orb */}
+        {/* Soft Violet Orb */}
         <div 
-          className="absolute -top-[10%] -right-[15%] w-[850px] h-[850px] rounded-full opacity-60 filter blur-[120px] animate-mesh-float"
+          className="absolute -top-[10%] -right-[15%] w-[850px] h-[850px] rounded-full opacity-60 filter blur-[120px]"
           style={{
-            background: 'radial-gradient(circle, rgba(244,114,182,0.85) 0%, rgba(192,132,252,0.8) 35%, rgba(99,102,241,0.6) 65%, rgba(56,189,248,0) 80%)'
+            background: 'radial-gradient(circle, rgba(244,114,182,0.85) 0%, rgba(192,132,252,0.8) 35%, rgba(99,102,241,0.6) 65%, transparent 85%)'
           }}
         />
 
-        {/* Warm Peachy-Coral Center Glow */}
+        {/* Soft Peach Glow */}
         <div 
           className="absolute top-[25%] left-[20%] w-[650px] h-[650px] rounded-full opacity-40 filter blur-[130px]"
           style={{
-            background: 'radial-gradient(circle, rgba(251,146,60,0.6) 0%, rgba(244,63,94,0.5) 45%, rgba(168,85,247,0) 75%)'
+            background: 'radial-gradient(circle, rgba(251,146,60,0.55) 0%, rgba(244,63,94,0.45) 45%, transparent 75%)'
           }}
         />
 
-        {/* Deep Violet / Indigo Base Glow */}
+        {/* Deep Violet Base Glow */}
         <div 
           className="absolute -bottom-[20%] -left-[10%] w-[750px] h-[750px] rounded-full opacity-50 filter blur-[140px]"
           style={{
-            background: 'radial-gradient(circle, rgba(99,102,241,0.7) 0%, rgba(139,92,246,0.6) 40%, rgba(14,165,233,0) 80%)'
+            background: 'radial-gradient(circle, rgba(99,102,241,0.65) 0%, rgba(139,92,246,0.55) 40%, transparent 80%)'
           }}
         />
 
@@ -199,35 +201,31 @@ export default function App() {
 
       {/* Toast notification */}
       {toastMessage && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full glass-card border border-white/20 text-white text-xs shadow-2xl backdrop-blur-2xl">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-2xl glass-card border border-white/20 text-white text-xs font-semibold shadow-2xl animate-fade-in backdrop-blur-xl">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="font-medium tracking-wide">{toastMessage.msg}</span>
+          <span>{toastMessage.msg}</span>
         </div>
       )}
 
-      {/* Floating Glass Navigation Header */}
-      <div className="relative z-40">
-        <Navbar
-          currentRole={currentRole}
-          setCurrentRole={handleRoleChange}
-          currentUser={currentUser}
-          onLogout={handleLogout}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onOpenReportModal={() => setIsReportModalOpen(true)}
-          onOpenDocsModal={() => setIsDocsModalOpen(true)}
-        />
-      </div>
+      {/* Top Navbar */}
+      <Navbar
+        currentRole={currentRole}
+        setCurrentRole={handleRoleChange}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenReportModal={() => setIsReportModalOpen(true)}
+        onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
+      />
 
-      {/* Main Content Area */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
-        {loading ? (
-          <div className="h-80 sm:h-96 flex flex-col items-center justify-center gap-4">
-            <div className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center">
-              <Loader2 className="w-6 h-6 text-fuchsia-400 animate-spin" />
-            </div>
-            <p className="text-xs text-slate-400 font-medium tracking-wide">
-              Loading operational metrics...
+      {/* Main Content View Container */}
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+        {loading && complaints.length === 0 ? (
+          <div className="h-96 flex flex-col items-center justify-center space-y-3 glass-card rounded-[32px] border border-white/10">
+            <Loader2 className="w-8 h-8 animate-spin text-fuchsia-400" />
+            <p className="text-xs text-slate-400 tracking-wide font-medium">
+              Connecting to JIMS Campus Cloud...
             </p>
           </div>
         ) : (
@@ -238,6 +236,7 @@ export default function App() {
                 {activeTab === 'my-requests' && (
                   <StudentPortalView
                     complaints={complaints}
+                    currentUser={currentUser}
                     currentRole={currentRole}
                     onSelectComplaint={(c) => setSelectedComplaint(c)}
                     onOpenReportModal={() => setIsReportModalOpen(true)}
@@ -251,10 +250,6 @@ export default function App() {
                     onOpenReportModal={() => setIsReportModalOpen(true)}
                   />
                 )}
-
-                {activeTab === 'facilities' && (
-                  <FacilityDirectoryView facilities={facilities} />
-                )}
               </>
             )}
 
@@ -262,6 +257,7 @@ export default function App() {
             {currentRole === 'technician' && (
               <TechnicianPortalView
                 complaints={complaints}
+                currentUser={currentUser}
                 activeSubTab={
                   activeTab === 'tech-queue' ? 'queue' : 
                   activeTab === 'tech-completed' ? 'completed' : 'assigned'
@@ -302,10 +298,6 @@ export default function App() {
                     onGenerateWorkOrder={handleGenerateWorkOrder}
                   />
                 )}
-
-                {activeTab === 'facilities' && (
-                  <FacilityDirectoryView facilities={facilities} />
-                )}
               </>
             )}
           </>
@@ -322,7 +314,7 @@ export default function App() {
             <span className="text-slate-400">JIMS Rohini Sector-5</span>
           </div>
           <div className="text-[11px] text-slate-400">
-            MCA Semester 3 Academic Project • Varun Malik, Shankar Sumar & Aditya
+            Jagan Institute of Management Studies • Autonomous Facility Operations
           </div>
         </div>
       </footer>
@@ -346,9 +338,10 @@ export default function App() {
         onStatusUpdated={handleStatusUpdated}
       />
 
-      <DocumentationModal
-        isOpen={isDocsModalOpen}
-        onClose={() => setIsDocsModalOpen(false)}
+      <AdminUserManagementModal
+        isOpen={isAddUserModalOpen}
+        onClose={() => setIsAddUserModalOpen(false)}
+        onUserAdded={handleUserAdded}
       />
     </div>
   );

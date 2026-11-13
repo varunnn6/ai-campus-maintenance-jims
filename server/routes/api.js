@@ -12,6 +12,7 @@ const router = express.Router();
 // --- Auth Routes ---
 router.post('/auth/register', authCtrl.register);
 router.post('/auth/login', authCtrl.login);
+router.post('/auth/users', authCtrl.createUser);
 router.get('/auth/me', authenticateToken, authCtrl.getCurrentUser);
 router.get('/auth/technicians', authCtrl.getTechnicians);
 

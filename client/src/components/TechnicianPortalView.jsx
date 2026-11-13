@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { 
   Wrench, 
-  Clock, 
   MapPin, 
   CheckCircle2, 
   AlertCircle, 
   Camera, 
   Plus, 
-  ArrowRight,
-  ShieldCheck,
-  Check,
-  Loader2,
-  ListTodo
+  Loader2, 
+  ListTodo,
+  Sparkles,
+  Zap,
+  Check
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
 export default function TechnicianPortalView({ 
   complaints = [], 
+  currentUser,
   onSelectComplaint, 
   onRefresh, 
   activeSubTab = 'assigned' 
@@ -24,9 +24,13 @@ export default function TechnicianPortalView({
   const [subTab, setSubTab] = useState(activeSubTab);
   const [processingId, setProcessingId] = useState(null);
 
+  const techName = currentUser?.name || 'Field Technician';
+  const techTrade = currentUser?.trade || 'Electrical & HVAC';
+
   // Filter complaints based on technician perspective
   const assignedJobs = complaints.filter(c => 
-    (c.assignedTo?.name && c.assignedTo.name.toLowerCase().includes('rajesh')) ||
+    (c.assignedTo?.id === currentUser?._id) ||
+    (c.assignedTo?.name && currentUser?.name && c.assignedTo.name.toLowerCase() === currentUser.name.toLowerCase()) ||
     (c.status === 'Assigned' || c.status === 'In Progress')
   );
 
@@ -40,17 +44,19 @@ export default function TechnicianPortalView({
     c.status === 'Resolved' || c.status === 'Closed'
   );
 
-  // Quick Action: Accept an unassigned job
+  // Quick Action: Accept an unassigned job (Opt-In)
   const handleAcceptJob = async (c, e) => {
     e.stopPropagation();
     setProcessingId(c._id || c.complaintId);
     try {
-      await apiRequest(`/complaints/${c._id || c.id}/assign`, {
+      await apiRequest(`/complaints/${c._id || c.id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          technicianId: 'user-tech-1', 
-          note: 'Job claimed by field technician Rajesh Kumar' 
+          status: 'In Progress',
+          technicianId: currentUser?._id || 'tech',
+          technicianName: techName,
+          note: `Incident claimed by ${techName} (${techTrade})` 
         })
       });
       if (onRefresh) onRefresh();
@@ -71,7 +77,8 @@ export default function TechnicianPortalView({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           status: 'In Progress', 
-          note: 'Technician on-site, commencing diagnostics & repairs' 
+          technicianName: techName,
+          note: `${techName} arrived on-site, beginning diagnostics & repairs` 
         })
       });
       if (onRefresh) onRefresh();
@@ -97,7 +104,7 @@ export default function TechnicianPortalView({
       {/* Technician Profile & Quick Stats Banner */}
       <div className="relative rounded-[32px] overflow-hidden glass-card border border-white/20 p-8 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         
-        {/* Glow */}
+        {/* Warm Ambient Glow */}
         <div 
           className="absolute -right-[10%] -top-[20%] w-[450px] h-[450px] rounded-full opacity-60 filter blur-[90px] pointer-events-none"
           style={{
@@ -108,13 +115,13 @@ export default function TechnicianPortalView({
         <div className="relative z-10 space-y-2 max-w-xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill text-[11px] font-semibold text-amber-300">
             <Wrench className="w-3.5 h-3.5 text-amber-400" />
-            <span>Field Operations Console</span>
+            <span>Field Maintenance Crew Console</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Rajesh Kumar
+            {techName}
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            Senior Electrical & HVAC Technician • JIMS Campus Infrastructure Maintenance Crew
+            {techTrade} • AI auto-routes reported campus defects to your queue for immediate inspection, repair, and proof uploads.
           </p>
         </div>
 
@@ -137,10 +144,10 @@ export default function TechnicianPortalView({
       </div>
 
       {/* Segmented Filter Pills */}
-      <div className="flex items-center gap-2 p-1.5 rounded-full glass-card border border-white/10 w-fit text-xs font-semibold">
+      <div className="flex items-center gap-2 p-1.5 rounded-full glass-card border border-white/10 w-fit text-xs font-semibold overflow-x-auto max-w-full">
         <button
           onClick={() => setSubTab('assigned')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer whitespace-nowrap ${
             subTab === 'assigned' 
               ? 'bg-white text-slate-900 shadow-md' 
               : 'text-slate-300 hover:text-white'
@@ -152,7 +159,7 @@ export default function TechnicianPortalView({
 
         <button
           onClick={() => setSubTab('queue')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer whitespace-nowrap ${
             subTab === 'queue' 
               ? 'bg-white text-slate-900 shadow-md' 
               : 'text-slate-300 hover:text-white'
@@ -164,7 +171,7 @@ export default function TechnicianPortalView({
 
         <button
           onClick={() => setSubTab('completed')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-5 py-2 rounded-full transition-all cursor-pointer whitespace-nowrap ${
             subTab === 'completed' 
               ? 'bg-white text-slate-900 shadow-md' 
               : 'text-slate-300 hover:text-white'
@@ -181,7 +188,7 @@ export default function TechnicianPortalView({
         {/* ASSIGNED JOBS TAB */}
         {subTab === 'assigned' && (
           assignedJobs.length === 0 ? (
-            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px]">
+            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px] border border-white/10">
               No active jobs assigned. Browse the Open Pool to pick up an incident!
             </div>
           ) : (
@@ -193,9 +200,17 @@ export default function TechnicianPortalView({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <span className="text-xs font-mono font-bold text-fuchsia-300">
-                      {job.complaintId}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-fuchsia-300">
+                        {job.complaintId}
+                      </span>
+                      {job.targetTrade && (
+                        <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 font-semibold">
+                          <Sparkles className="w-3 h-3 text-violet-400" />
+                          <span>AI: {job.targetTrade}</span>
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-base font-bold text-white mt-1">
                       {job.title}
                     </h3>
@@ -256,7 +271,7 @@ export default function TechnicianPortalView({
         {/* OPEN QUEUE TAB */}
         {subTab === 'queue' && (
           openQueue.length === 0 ? (
-            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px]">
+            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px] border border-white/10">
               Campus queue is clear! All current incidents have been assigned.
             </div>
           ) : (
@@ -268,9 +283,17 @@ export default function TechnicianPortalView({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <span className="text-xs font-mono font-bold text-amber-300">
-                      {job.complaintId}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-amber-300">
+                        {job.complaintId}
+                      </span>
+                      {job.targetTrade && (
+                        <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30 font-semibold">
+                          <Zap className="w-3 h-3 text-fuchsia-400" />
+                          <span>AI Auto-Dispatched to {job.targetTrade}</span>
+                        </span>
+                      )}
+                    </div>
                     <h3 className="text-base font-bold text-white mt-1">
                       {job.title}
                     </h3>
@@ -304,7 +327,7 @@ export default function TechnicianPortalView({
                     ) : (
                       <Plus className="w-3.5 h-3.5 text-slate-900" />
                     )}
-                    <span>Claim & Assign to Me</span>
+                    <span>Opt In & Claim Task</span>
                   </button>
                 </div>
               </div>
@@ -315,7 +338,7 @@ export default function TechnicianPortalView({
         {/* COMPLETED TAB */}
         {subTab === 'completed' && (
           completedJobs.length === 0 ? (
-            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px]">
+            <div className="col-span-2 py-16 text-center text-slate-400 glass-card rounded-[28px] border border-white/10">
               No resolved jobs logged yet.
             </div>
           ) : (
@@ -346,7 +369,7 @@ export default function TechnicianPortalView({
 
                 {job.feedback && (
                   <div className="pt-2 border-t border-white/[0.08] flex items-center gap-2 text-xs text-amber-300 font-medium">
-                    <span>User Satisfaction:</span>
+                    <span>User Rating:</span>
                     <span>★ {job.feedback.rating}/5</span>
                     {job.feedback.comment && <span className="text-slate-400 italic font-normal">"{job.feedback.comment}"</span>}
                   </div>
@@ -361,4 +384,3 @@ export default function TechnicianPortalView({
     </div>
   );
 }
-

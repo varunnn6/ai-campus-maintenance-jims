@@ -2,10 +2,10 @@
 
 // In development (port 3000): use local backend
 // In production: use VITE_API_URL env variable or fallback to relative /api
-const isDev = typeof window !== 'undefined' && window.location.port === '3000';
+const isDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000';
 export const API_BASE = isDev
   ? `http://${window.location.hostname}:5005/api`
-  : (import.meta.env.VITE_API_URL || 'http://localhost:5005/api');
+  : (import.meta.env.VITE_API_URL || 'https://campus-maintenance-backend-production.up.railway.app/api');
 
 export async function apiRequest(endpoint, options = {}) {
   const cleanEndpoint = endpoint.startsWith('/api') 
