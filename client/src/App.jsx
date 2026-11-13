@@ -5,6 +5,8 @@ import DashboardView from './components/DashboardView.jsx';
 import ComplaintsListView from './components/ComplaintsListView.jsx';
 import PredictiveMaintenanceHub from './components/PredictiveMaintenanceHub.jsx';
 import FacilityDirectoryView from './components/FacilityDirectoryView.jsx';
+import StudentPortalView from './components/StudentPortalView.jsx';
+import TechnicianPortalView from './components/TechnicianPortalView.jsx';
 import ReportIssueModal from './components/ReportIssueModal.jsx';
 import ComplaintDetailModal from './components/ComplaintDetailModal.jsx';
 import DocumentationModal from './components/DocumentationModal.jsx';
@@ -14,8 +16,8 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [currentRole, setCurrentRole] = useState('admin');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [currentRole, setCurrentRole] = useState('student');
+  const [activeTab, setActiveTab] = useState('my-requests');
 
   // Data states
   const [complaints, setComplaints] = useState([]);
@@ -80,9 +82,23 @@ export default function App() {
     fetchData();
   }, []);
 
+  const handleRoleChange = (role) => {
+    setCurrentRole(role);
+    if (role === 'student' || role === 'staff') {
+      setActiveTab('my-requests');
+      showToast(`Switched to ${role === 'student' ? 'Varun Malik (Student)' : 'Prof. Shankar Sumar (Faculty)'}`);
+    } else if (role === 'technician') {
+      setActiveTab('tech-assigned');
+      showToast(`Switched to Rajesh Kumar (Field Technician)`);
+    } else {
+      setActiveTab('dashboard');
+      showToast(`Switched to Dr. R. K. Sharma (Administrator)`);
+    }
+  };
+
   const handleComplaintCreated = (newComplaint) => {
     setComplaints(prev => [newComplaint, ...prev]);
-    showToast(`Issue ${newComplaint.complaintId} created & dispatched successfully`);
+    showToast(`Incident ${newComplaint.complaintId} created & dispatched successfully`);
     fetchData();
   };
 
@@ -103,7 +119,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-[#07080B] text-slate-100 flex flex-col font-sans selection:bg-fuchsia-500 selection:text-white overflow-hidden">
       
-      {/* 🌟 Radiant Bold Ambient Gradient Mesh Background (Matching Inspiration Image) */}
+      {/* 🌟 Radiant Bold Ambient Gradient Mesh Background */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Giant Top-Right Aurora Orb */}
         <div 
@@ -129,7 +145,6 @@ export default function App() {
           }}
         />
 
-        {/* Subtle noise texture overlay for organic analog depth */}
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
       </div>
 
@@ -145,11 +160,7 @@ export default function App() {
       <div className="relative z-40">
         <Navbar
           currentRole={currentRole}
-          setCurrentRole={(role) => {
-            setCurrentRole(role);
-            if (role === 'technician') setActiveTab('complaints');
-            showToast(`Switched view to ${role.toUpperCase()}`);
-          }}
+          setCurrentRole={handleRoleChange}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onOpenReportModal={() => setIsReportModalOpen(true)}
@@ -165,42 +176,86 @@ export default function App() {
               <Loader2 className="w-6 h-6 text-fuchsia-400 animate-spin" />
             </div>
             <p className="text-xs text-slate-400 font-medium tracking-wide">
-              Initializing CampusOps Intelligence...
+              Loading tailored interface...
             </p>
           </div>
         ) : (
           <>
-            {activeTab === 'dashboard' && (
-              <DashboardView
-                summary={summary}
-                trendData={trendData}
-                riskHeatmap={riskHeatmap}
+            {/* 1. STUDENT & FACULTY SPECIFIC VIEWS */}
+            {(currentRole === 'student' || currentRole === 'staff') && (
+              <>
+                {activeTab === 'my-requests' && (
+                  <StudentPortalView
+                    complaints={complaints}
+                    currentRole={currentRole}
+                    onSelectComplaint={(c) => setSelectedComplaint(c)}
+                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                  />
+                )}
+
+                {activeTab === 'all-issues' && (
+                  <ComplaintsListView
+                    complaints={complaints}
+                    onSelectComplaint={(c) => setSelectedComplaint(c)}
+                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                  />
+                )}
+
+                {activeTab === 'facilities' && (
+                  <FacilityDirectoryView facilities={facilities} />
+                )}
+              </>
+            )}
+
+            {/* 2. TECHNICIAN SPECIFIC VIEWS */}
+            {currentRole === 'technician' && (
+              <TechnicianPortalView
                 complaints={complaints}
+                activeSubTab={
+                  activeTab === 'tech-queue' ? 'queue' : 
+                  activeTab === 'tech-completed' ? 'completed' : 'assigned'
+                }
                 onSelectComplaint={(c) => setSelectedComplaint(c)}
                 onRefresh={fetchData}
-                onOpenReportModal={() => setIsReportModalOpen(true)}
-                onOpenPredictive={() => setActiveTab('predictive')}
               />
             )}
 
-            {activeTab === 'complaints' && (
-              <ComplaintsListView
-                complaints={complaints}
-                onSelectComplaint={(c) => setSelectedComplaint(c)}
-                onOpenReportModal={() => setIsReportModalOpen(true)}
-              />
-            )}
+            {/* 3. ADMINISTRATOR SPECIFIC VIEWS */}
+            {currentRole === 'admin' && (
+              <>
+                {activeTab === 'dashboard' && (
+                  <DashboardView
+                    summary={summary}
+                    trendData={trendData}
+                    riskHeatmap={riskHeatmap}
+                    complaints={complaints}
+                    onSelectComplaint={(c) => setSelectedComplaint(c)}
+                    onRefresh={fetchData}
+                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                    onOpenPredictive={() => setActiveTab('predictive')}
+                  />
+                )}
 
-            {activeTab === 'predictive' && (
-              <PredictiveMaintenanceHub
-                riskHeatmap={riskHeatmap}
-                recurringClusters={recurringClusters}
-                onGenerateWorkOrder={handleGenerateWorkOrder}
-              />
-            )}
+                {activeTab === 'complaints' && (
+                  <ComplaintsListView
+                    complaints={complaints}
+                    onSelectComplaint={(c) => setSelectedComplaint(c)}
+                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                  />
+                )}
 
-            {activeTab === 'facilities' && (
-              <FacilityDirectoryView facilities={facilities} />
+                {activeTab === 'predictive' && (
+                  <PredictiveMaintenanceHub
+                    riskHeatmap={riskHeatmap}
+                    recurringClusters={recurringClusters}
+                    onGenerateWorkOrder={handleGenerateWorkOrder}
+                  />
+                )}
+
+                {activeTab === 'facilities' && (
+                  <FacilityDirectoryView facilities={facilities} />
+                )}
+              </>
             )}
           </>
         )}
@@ -213,10 +268,10 @@ export default function App() {
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-semibold text-slate-200 tracking-tight">CampusOps</span>
             <span className="text-slate-500">•</span>
-            <span className="text-slate-400">Predictive Facility Management</span>
+            <span className="text-slate-400">Role-Adaptive Facility Management</span>
           </div>
           <div className="text-[11px] text-slate-400">
-            Jagan Institute of Management Studies (JIMS Rohini) • MCA Academic Project
+            Jagan Institute of Management Studies (JIMS Rohini) • Varun Malik, Shankar Sumar & Aditya
           </div>
         </div>
       </footer>
