@@ -1,0 +1,1071 @@
+{
+  "users": [
+    {
+      "_id": "user-tech-2",
+      "name": "Manoj Verma (Plumbing & Civil Tech)",
+      "email": "tech.civil@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3Xkscuf7kMiaHmk1TZe96ZyZSutQN7zzr0cF6",
+      "role": "technician",
+      "department": "Campus Civil & Sanitation Team",
+      "phone": "+91 98188 33221",
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    },
+    {
+      "_id": "user-tech-1",
+      "name": "Rajesh Kumar (Sr. Electrical & HVAC Tech)",
+      "email": "tech@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3Xkscuf7kMiaHmk1TZe96ZyZSutQN7zzr0cF6",
+      "role": "technician",
+      "department": "Campus Electrical & Maintenance Team",
+      "phone": "+91 99100 88776",
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    },
+    {
+      "_id": "user-student-2",
+      "name": "Aditya",
+      "email": "aditya@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3XkscuBx0YwCnHnqh77bTofFT3p3FcLewMWB.",
+      "role": "student",
+      "department": "Master of Computer Applications (MCA)",
+      "phone": "+91 98101 44556",
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    },
+    {
+      "_id": "user-staff-1",
+      "name": "Prof. Shankar Sumar",
+      "email": "shankar@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3XkscuAV6yusy3n8RtUDhxFEmQg0jMQ.l7.pS",
+      "role": "staff",
+      "department": "Department of Computer Applications",
+      "phone": "+91 98711 67890",
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    },
+    {
+      "_id": "user-student-1",
+      "name": "Varun Malik",
+      "email": "varun@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3XkscuBx0YwCnHnqh77bTofFT3p3FcLewMWB.",
+      "role": "student",
+      "department": "Master of Computer Applications (MCA)",
+      "phone": "+91 99580 54321",
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    },
+    {
+      "_id": "user-admin-1",
+      "name": "Dr. R. K. Sharma (Facility Director)",
+      "email": "admin@jims.edu",
+      "password": "$2a$10$Cp9N44fohKKf7hAj3XkscuqYWpx6CXON3gOMNdtPFClyoD/2qjW9O",
+      "role": "admin",
+      "department": "Campus Administration & Infrastructure",
+      "phone": "+91 98110 12345",
+      "createdAt": "2026-11-12T17:54:10.499Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    }
+  ],
+  "facilities": [
+    {
+      "_id": "fac-8",
+      "name": "Server & Network Control Room",
+      "block": "Block B",
+      "floor": "Basement",
+      "roomNumber": "DC-B01",
+      "type": "Data Center",
+      "assets": [
+        {
+          "name": "Emerson Liebert Precision Cooling",
+          "assetTag": "HVAC-DC-01",
+          "type": "HVAC",
+          "healthScore": 90
+        },
+        {
+          "name": "FM-200 Fire Suppression Gas Cylinder",
+          "assetTag": "SAF-DC-FM200",
+          "type": "Safety",
+          "healthScore": 98
+        }
+      ],
+      "riskScore": 22,
+      "activeIssuesCount": 0,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-7",
+      "name": "Campus Cafeteria & Courtyard",
+      "block": "Block A",
+      "floor": "Ground Floor",
+      "roomNumber": "CAN-GF",
+      "type": "Cafeteria",
+      "assets": [
+        {
+          "name": "Commercial Grease Trap & Drainage",
+          "assetTag": "PLM-CAN-DRN",
+          "type": "Plumbing",
+          "healthScore": 60
+        }
+      ],
+      "riskScore": 55,
+      "activeIssuesCount": 1,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-6",
+      "name": "MCA Lecture Hall 301",
+      "block": "Block B",
+      "floor": "3rd Floor",
+      "roomNumber": "Room 301",
+      "type": "Classroom",
+      "assets": [
+        {
+          "name": "Interactive Digital Whiteboard",
+          "assetTag": "IFP-301-01",
+          "type": "IT",
+          "healthScore": 85
+        },
+        {
+          "name": "Split AC 1.5 Ton",
+          "assetTag": "AC-301-01",
+          "type": "HVAC",
+          "healthScore": 78
+        }
+      ],
+      "riskScore": 28,
+      "activeIssuesCount": 1,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-5",
+      "name": "Block B 2nd Floor Washrooms",
+      "block": "Block B",
+      "floor": "2nd Floor",
+      "roomNumber": "WR-B2-01",
+      "type": "Sanitation & Restroom",
+      "assets": [
+        {
+          "name": "Commercial RO Water Dispenser",
+          "assetTag": "RO-B2-COOL",
+          "type": "Plumbing",
+          "healthScore": 52
+        },
+        {
+          "name": "Automated Cistern Flush System",
+          "assetTag": "PLM-B2-FLUSH",
+          "type": "Plumbing",
+          "healthScore": 40
+        }
+      ],
+      "riskScore": 82,
+      "activeIssuesCount": 3,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-4",
+      "name": "JIMS Main Auditorium",
+      "block": "Block A",
+      "floor": "Ground Floor",
+      "roomNumber": "AUD-GF",
+      "type": "Auditorium",
+      "assets": [
+        {
+          "name": "Digital Sound Mixer Console",
+          "assetTag": "AV-AUD-MIX",
+          "type": "AudioVisual",
+          "healthScore": 75
+        },
+        {
+          "name": "Emergency Fire Exit Doors (Dual)",
+          "assetTag": "CIV-AUD-EXIT",
+          "type": "Safety",
+          "healthScore": 88
+        }
+      ],
+      "riskScore": 35,
+      "activeIssuesCount": 1,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-3",
+      "name": "Central Library & Reading Hall",
+      "block": "Block A",
+      "floor": "1st Floor",
+      "roomNumber": "Lib-Main",
+      "type": "Library",
+      "assets": [
+        {
+          "name": "Central Air Handling Unit (AHU)",
+          "assetTag": "AHU-LIB-01",
+          "type": "HVAC",
+          "healthScore": 82
+        },
+        {
+          "name": "RFID Entrance Security Gate",
+          "assetTag": "SEC-LIB-GATE",
+          "type": "Electronics",
+          "healthScore": 95
+        }
+      ],
+      "riskScore": 30,
+      "activeIssuesCount": 1,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-2",
+      "name": "Computer Lab 1 (Programming Lab)",
+      "block": "Block B",
+      "floor": "1st Floor",
+      "roomNumber": "Lab 101",
+      "type": "Computer Laboratory",
+      "assets": [
+        {
+          "name": "Epson Overhead Ceiling Projector",
+          "assetTag": "PRJ-LAB1-01",
+          "type": "AudioVisual",
+          "healthScore": 62
+        },
+        {
+          "name": "Central UPS 10kVA Inverter",
+          "assetTag": "UPS-B1-10K",
+          "type": "Electrical",
+          "healthScore": 84
+        }
+      ],
+      "riskScore": 45,
+      "activeIssuesCount": 1,
+      "createdAt": "2026-11-12T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "fac-1",
+      "name": "Computer Lab 2 (AI & Cloud Lab)",
+      "block": "Block B",
+      "floor": "2nd Floor",
+      "roomNumber": "Lab 202",
+      "type": "Computer Laboratory",
+      "assets": [
+        {
+          "name": "Precision Split AC Unit 2-Ton",
+          "assetTag": "AC-B2-02",
+          "type": "HVAC",
+          "healthScore": 48
+        },
+        {
+          "name": "Core i7 Workstations (35 Units)",
+          "assetTag": "PC-LAB2-SET",
+          "type": "IT",
+          "healthScore": 92
+        },
+        {
+          "name": "Cisco 48-Port Gigabit Switch",
+          "assetTag": "SW-LAB2-01",
+          "type": "Networking",
+          "healthScore": 88
+        }
+      ],
+      "riskScore": 78,
+      "activeIssuesCount": 2,
+      "createdAt": "2026-11-12T17:54:10.500Z",
+      "updatedAt": "2026-11-12T17:54:10.500Z"
+    }
+  ],
+  "complaints": [
+    {
+      "_id": "57a8e1f2-f843-45db-8ebe-8cc7c861ecb6",
+      "complaintId": "JIMS-2026-0110",
+      "title": "Water dripping from AC in Lab 202",
+      "description": "Continuous water droplet leakage onto floor near student desks",
+      "category": "HVAC & Climate Control",
+      "priority": "High",
+      "status": "Submitted",
+      "location": {
+        "facilityId": "",
+        "facilityName": "Block B",
+        "building": "Block B",
+        "floor": "2nd Floor",
+        "room": "Lab 202",
+        "specificAsset": "AC-B2-02"
+      },
+      "reportedBy": {
+        "id": "guest",
+        "name": "Campus User",
+        "email": "user@jims.edu",
+        "role": "student"
+      },
+      "images": [],
+      "aiClassification": null,
+      "aiPriority": null,
+      "cvAnalysis": null,
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted by user via web portal",
+          "updatedBy": "Campus User",
+          "timestamp": "2026-11-12T18:17:41.052Z"
+        }
+      ],
+      "createdAt": "2026-11-12T18:17:41.052Z",
+      "updatedAt": "2026-11-12T18:17:41.052Z"
+    },
+    {
+      "_id": "2f7ca8e9-87d1-4bc3-85a6-7492c4066859",
+      "complaintId": "JIMS-2026-0109",
+      "title": "Air conditioner in Seminar Hall making loud grinding noise and not cooling",
+      "description": "Split AC compressor unit rattling violently and blowing warm air. High temperature in room during session.",
+      "category": "HVAC & Climate Control",
+      "priority": "Medium",
+      "status": "Submitted",
+      "location": {
+        "facilityId": "",
+        "facilityName": "Block B",
+        "building": "Block B",
+        "floor": "3rd Floor",
+        "room": "Room 301",
+        "specificAsset": ""
+      },
+      "reportedBy": {
+        "id": "guest",
+        "name": "Campus User",
+        "email": "user@jims.edu",
+        "role": "student"
+      },
+      "images": [
+        {
+          "url": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"200\" style=\"background:%232a323d\"><rect x=\"40\" y=\"60\" width=\"220\" height=\"70\" fill=\"%23cbd5e1\" rx=\"4\"/><line x1=\"60\" y1=\"100\" x2=\"240\" y2=\"100\" stroke=\"%2364748b\" stroke-width=\"4\"/><path d=\"M120 130 Q150 160 180 130\" stroke=\"%23ef4444\" stroke-width=\"3\" fill=\"none\"/></svg>",
+          "caption": "Attached inspection photo"
+        }
+      ],
+      "aiClassification": {
+        "category": "HVAC & Climate Control",
+        "confidence": 0.95,
+        "keywords": [
+          "ac",
+          "air conditioner",
+          "cooling",
+          "compressor"
+        ],
+        "method": "Node.js Fallback Classifier"
+      },
+      "aiPriority": {
+        "priority": "Medium",
+        "urgencyScore": 55,
+        "slaHours": 24,
+        "rationale": [
+          "Operational facility impact for HVAC & Climate Control"
+        ],
+        "recommendedAction": "Schedule within regular maintenance window"
+      },
+      "cvAnalysis": {
+        "success": true,
+        "detectedFault": "Visual Surface Defect / Wear Detected",
+        "category": "Civil & Furniture",
+        "confidence": 0.85,
+        "visualFeatures": "Texture irregularity and visual edge disruption detected",
+        "suggestedAction": "Visual inspection recommended by facility staff",
+        "isFallback": true
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted by user via web portal",
+          "updatedBy": "Campus User",
+          "timestamp": "2026-11-12T18:14:18.294Z"
+        }
+      ],
+      "createdAt": "2026-11-12T18:14:18.294Z",
+      "updatedAt": "2026-11-12T18:14:18.294Z"
+    },
+    {
+      "_id": "ec086220-7f63-4435-9365-673a65abe0d1",
+      "complaintId": "JIMS-2026-0108",
+      "title": "Switchboard sparking and burnt plastic odor near Lab 2 entrance",
+      "description": "Noticed bright spark and sizzling sound when turning on main lab lights. Burnt smell and scorch mark on switch plate.",
+      "category": "Electrical & Power",
+      "priority": "Critical",
+      "status": "Resolved",
+      "location": {
+        "facilityId": "",
+        "facilityName": "Block B",
+        "building": "Block B",
+        "floor": "2nd Floor",
+        "room": "Lab 202",
+        "specificAsset": ""
+      },
+      "reportedBy": {
+        "id": "guest",
+        "name": "Campus User",
+        "email": "user@jims.edu",
+        "role": "student"
+      },
+      "images": [
+        {
+          "url": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"300\" height=\"200\" style=\"background:%231f242d\"><rect x=\"100\" y=\"50\" width=\"100\" height=\"100\" fill=\"%23374151\" rx=\"8\"/><circle cx=\"150\" cy=\"100\" r=\"14\" fill=\"%23f59e0b\"/><polygon points=\"150,70 156,90 175,90 160,102 166,122 150,110 134,122 140,102 125,90 144,90\" fill=\"%23ef4444\"/></svg>",
+          "caption": "Attached inspection photo"
+        }
+      ],
+      "aiClassification": {
+        "category": "Electrical & Power",
+        "confidence": 0.95,
+        "keywords": [
+          "spark",
+          "light",
+          "switch"
+        ],
+        "method": "Node.js Fallback Classifier"
+      },
+      "aiPriority": {
+        "priority": "Critical",
+        "urgencyScore": 100,
+        "slaHours": 2,
+        "rationale": [
+          "Elevated safety baseline for Electrical & Power",
+          "Critical hazard keywords detected",
+          "Critical academic or server infrastructure zone"
+        ],
+        "recommendedAction": "Prioritize in today's dispatch queue"
+      },
+      "cvAnalysis": {
+        "success": true,
+        "detectedFault": "Visual Surface Defect / Wear Detected",
+        "category": "Civil & Furniture",
+        "confidence": 0.85,
+        "visualFeatures": "Texture irregularity and visual edge disruption detected",
+        "suggestedAction": "Visual inspection recommended by facility staff",
+        "isFallback": true
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted by user via web portal",
+          "updatedBy": "Campus User",
+          "timestamp": "2026-11-12T18:14:06.580Z"
+        },
+        {
+          "status": "Resolved",
+          "note": "Maintenance action performed by Campus Technician: nknk",
+          "updatedBy": "Campus Technician",
+          "timestamp": "2026-11-12T18:14:41.163Z"
+        }
+      ],
+      "createdAt": "2026-11-12T18:14:06.580Z",
+      "updatedAt": "2026-11-12T18:14:43.678Z",
+      "feedback": {
+        "rating": 5,
+        "comment": "",
+        "submittedAt": "2026-11-12T18:14:43.678Z"
+      }
+    },
+    {
+      "_id": "50967e4e-cfde-42f3-9b3a-e2177ccb2d52",
+      "complaintId": "JIMS-2026-0107",
+      "title": "Test Issue",
+      "description": "Testing complaint reporting",
+      "category": "Civil & Furniture",
+      "priority": "Medium",
+      "status": "Submitted",
+      "location": {
+        "facilityId": "",
+        "facilityName": "Main Campus",
+        "building": "Block B",
+        "floor": "1st Floor",
+        "room": "Room 101",
+        "specificAsset": ""
+      },
+      "reportedBy": {
+        "id": "guest",
+        "name": "Campus User",
+        "email": "user@jims.edu",
+        "role": "student"
+      },
+      "images": [],
+      "aiClassification": null,
+      "aiPriority": null,
+      "cvAnalysis": null,
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted by user via web portal",
+          "updatedBy": "Campus User",
+          "timestamp": "2026-11-12T18:12:29.327Z"
+        }
+      ],
+      "createdAt": "2026-11-12T18:12:29.328Z",
+      "updatedAt": "2026-11-12T18:12:29.328Z"
+    },
+    {
+      "_id": "bd7e99f0-4184-48f6-a105-5694989d1f35",
+      "complaintId": "JIMS-2026-1006",
+      "title": "Dustbins overflowing outside ground floor cafeteria courtyard",
+      "description": "Litter scattered near food stalls attracting flies and unpleasant odor.",
+      "category": "Sanitation & Hygiene",
+      "priority": "Medium",
+      "status": "Closed",
+      "location": {
+        "facilityId": "fac-7",
+        "facilityName": "Campus Cafeteria & Courtyard",
+        "building": "Block A",
+        "floor": "Ground Floor",
+        "room": "Courtyard"
+      },
+      "reportedBy": {
+        "id": "user-student-2",
+        "name": "Aditya",
+        "email": "aditya@jims.edu",
+        "role": "student"
+      },
+      "aiClassification": {
+        "category": "Sanitation & Hygiene",
+        "confidence": 0.94,
+        "keywords": [
+          "dustbins",
+          "overflowing",
+          "cafeteria",
+          "litter",
+          "odor"
+        ]
+      },
+      "aiPriority": {
+        "priority": "Medium",
+        "urgencyScore": 48,
+        "slaHours": 24,
+        "rationale": [
+          "Food court hygiene area",
+          "Sanitation backlog"
+        ],
+        "recommendedAction": "Empty bins and sanitize surrounding floor"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted",
+          "updatedBy": "Aditya",
+          "timestamp": "2026-11-07T17:54:10.501Z"
+        },
+        {
+          "status": "Resolved",
+          "note": "Housekeeping crew cleared and sanitized area",
+          "updatedBy": "Manoj Verma",
+          "timestamp": "2026-11-07T22:42:10.501Z"
+        },
+        {
+          "status": "Closed",
+          "note": "Verified clean by facility supervisor",
+          "updatedBy": "Dr. R. K. Sharma",
+          "timestamp": "2026-11-08T05:54:10.501Z"
+        }
+      ],
+      "createdAt": "2026-11-07T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    },
+    {
+      "_id": "2dc743be-d2af-4e15-bdbb-2ad2655d083e",
+      "complaintId": "JIMS-2026-1005",
+      "title": "Student bench desk leg loose and wobbling in Room 301",
+      "description": "Row 3 bench has loose bolt at bottom metal frame, wobbling when students write during lectures.",
+      "category": "Civil & Furniture",
+      "priority": "Low",
+      "status": "Resolved",
+      "location": {
+        "facilityId": "fac-6",
+        "facilityName": "MCA Lecture Hall 301",
+        "building": "Block B",
+        "floor": "3rd Floor",
+        "room": "Room 301"
+      },
+      "reportedBy": {
+        "id": "user-student-1",
+        "name": "Varun Malik",
+        "email": "varun@jims.edu",
+        "role": "student"
+      },
+      "assignedTo": {
+        "id": "user-tech-2",
+        "name": "Manoj Verma (Plumbing & Civil Tech)",
+        "role": "technician"
+      },
+      "aiClassification": {
+        "category": "Civil & Furniture",
+        "confidence": 0.92,
+        "keywords": [
+          "bench",
+          "desk",
+          "leg",
+          "wobbling",
+          "frame"
+        ]
+      },
+      "aiPriority": {
+        "priority": "Low",
+        "urgencyScore": 28,
+        "slaHours": 72,
+        "rationale": [
+          "Minor physical furniture wear",
+          "No immediate life safety hazard"
+        ],
+        "recommendedAction": "Tighten hex bolt assembly or weld joint"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Submitted via student portal",
+          "updatedBy": "Varun Malik",
+          "timestamp": "2026-11-08T17:54:10.501Z"
+        },
+        {
+          "status": "Resolved",
+          "note": "Bolts tightened and rubber buffer cap replaced",
+          "updatedBy": "Manoj Verma",
+          "timestamp": "2026-11-09T17:54:10.501Z"
+        }
+      ],
+      "createdAt": "2026-11-08T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    },
+    {
+      "_id": "f72d6157-5fc0-476c-ab97-d8a05dc3bbc8",
+      "complaintId": "JIMS-2026-1004",
+      "title": "Projector in Room 201 showing blurry image and red lamp error",
+      "description": "The ceiling projector lamp indicator is blinking red and the display turns off automatically after 5 minutes of class.",
+      "category": "IT & Computer Labs",
+      "priority": "Medium",
+      "status": "Resolved",
+      "location": {
+        "facilityId": "fac-2",
+        "facilityName": "Computer Lab 1 (Programming Lab)",
+        "building": "Block B",
+        "floor": "1st Floor",
+        "room": "Room 201",
+        "specificAsset": "PRJ-LAB1-01"
+      },
+      "reportedBy": {
+        "id": "user-staff-1",
+        "name": "Prof. Shankar Sumar",
+        "email": "shankar@jims.edu",
+        "role": "staff"
+      },
+      "assignedTo": {
+        "id": "user-tech-1",
+        "name": "Rajesh Kumar (Sr. Electrical & HVAC Tech)",
+        "role": "technician"
+      },
+      "aiClassification": {
+        "category": "IT & Computer Labs",
+        "confidence": 0.91,
+        "keywords": [
+          "projector",
+          "blurry",
+          "lamp error",
+          "display"
+        ]
+      },
+      "aiPriority": {
+        "priority": "Medium",
+        "urgencyScore": 50,
+        "slaHours": 24,
+        "rationale": [
+          "Academic facility impact",
+          "Medium urgency hardware fault"
+        ],
+        "recommendedAction": "Clean intake air filter and reset lamp usage hour counter"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Reported by Faculty",
+          "updatedBy": "Prof. Shankar Sumar",
+          "timestamp": "2026-11-10T17:54:10.501Z"
+        },
+        {
+          "status": "Assigned",
+          "note": "Assigned to IT technician",
+          "updatedBy": "Dr. R. K. Sharma",
+          "timestamp": "2026-11-10T22:42:10.501Z"
+        },
+        {
+          "status": "In Progress",
+          "note": "Inspecting lamp housing and thermal sensor",
+          "updatedBy": "Rajesh Kumar",
+          "timestamp": "2026-11-11T13:06:10.501Z"
+        },
+        {
+          "status": "Resolved",
+          "note": "Replaced projector lamp module (model ELPLP96) and vacuumed exhaust heat sink.",
+          "updatedBy": "Rajesh Kumar",
+          "timestamp": "2026-11-12T05:54:10.501Z"
+        }
+      ],
+      "feedback": {
+        "rating": 5,
+        "comment": "Very swift resolution before our MCA project presentation! Thank you.",
+        "submittedAt": "2026-11-12T13:06:10.501Z"
+      },
+      "createdAt": "2026-11-10T17:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    },
+    {
+      "_id": "33729803-1466-45a8-80d4-09fbf141528f",
+      "complaintId": "JIMS-2026-1003",
+      "title": "Water pipe joint leaking heavily under washroom sink on 2nd Floor",
+      "description": "Continuous stream of water escaping from the flex hose pipe under the central washbasin in Block B boys washroom. Puddle spreading to walkway.",
+      "category": "Plumbing & Water Supply",
+      "priority": "High",
+      "status": "Submitted",
+      "location": {
+        "facilityId": "fac-5",
+        "facilityName": "Block B 2nd Floor Washrooms",
+        "building": "Block B",
+        "floor": "2nd Floor",
+        "room": "WR-B2-01",
+        "specificAsset": "PLM-B2-FLUSH"
+      },
+      "reportedBy": {
+        "id": "user-student-2",
+        "name": "Aditya",
+        "email": "aditya@jims.edu",
+        "role": "student"
+      },
+      "aiClassification": {
+        "category": "Plumbing & Water Supply",
+        "confidence": 0.95,
+        "keywords": [
+          "pipe",
+          "leaking",
+          "washroom",
+          "sink",
+          "puddle"
+        ]
+      },
+      "aiPriority": {
+        "priority": "High",
+        "urgencyScore": 72,
+        "slaHours": 6,
+        "rationale": [
+          "Disruption keywords detected (water escaping)",
+          "Public hygiene touchpoint"
+        ],
+        "recommendedAction": "Turn off angle valve under sink and replace braided steel hose"
+      },
+      "cvAnalysis": {
+        "detectedFault": "Water Leakage & Fluid Accumulation",
+        "confidence": 0.94,
+        "visualFeatures": "Wet surface specular reflection (88% fluid tone dominance)",
+        "suggestedAction": "Isolate supply valve and inspect compression nut"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Complaint submitted with visual scan",
+          "updatedBy": "Aditya",
+          "timestamp": "2026-11-12T15:54:10.501Z"
+        }
+      ],
+      "createdAt": "2026-11-12T15:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    },
+    {
+      "_id": "79d1a217-ec24-4bcf-8650-aeef4c487059",
+      "complaintId": "JIMS-2026-1002",
+      "title": "Main MCB switchboard sparking and burning smell in Block B corridor",
+      "description": "Loud buzzing and electrical spark noticed near the distribution board switch outside Room 204. Strong burnt plastic smell.",
+      "category": "Electrical & Power",
+      "priority": "Critical",
+      "status": "In Progress",
+      "location": {
+        "facilityId": "fac-5",
+        "facilityName": "Block B 2nd Floor Washrooms",
+        "building": "Block B",
+        "floor": "2nd Floor",
+        "room": "Corridor DB-2",
+        "specificAsset": "DB-B2-CORR"
+      },
+      "reportedBy": {
+        "id": "user-staff-1",
+        "name": "Prof. Shankar Sumar",
+        "email": "shankar@jims.edu",
+        "role": "staff"
+      },
+      "assignedTo": {
+        "id": "user-tech-1",
+        "name": "Rajesh Kumar (Sr. Electrical & HVAC Tech)",
+        "role": "technician",
+        "assignedAt": "2026-11-12T15:54:10.501Z"
+      },
+      "aiClassification": {
+        "category": "Electrical & Power",
+        "confidence": 0.98,
+        "keywords": [
+          "switchboard",
+          "sparking",
+          "burning smell",
+          "mcb",
+          "switch"
+        ]
+      },
+      "aiPriority": {
+        "priority": "Critical",
+        "urgencyScore": 96,
+        "slaHours": 2,
+        "rationale": [
+          "Critical severity keywords (sparking / burning smell)",
+          "Elevated safety baseline for Electrical & Power"
+        ],
+        "recommendedAction": "Immediate isolation of circuit breaker and thermal scan"
+      },
+      "cvAnalysis": {
+        "detectedFault": "Thermal Hotspot or Burnt Electrical Contact",
+        "confidence": 0.95,
+        "visualFeatures": "High-intensity luminance flash and adjacent scorch mark",
+        "suggestedAction": "De-energize main breaker before touching casing"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Emergency report logged by faculty",
+          "updatedBy": "Prof. Shankar Sumar",
+          "timestamp": "2026-11-12T14:54:10.501Z"
+        },
+        {
+          "status": "Verified",
+          "note": "Automated AI Critical Alert triggered SMS to team",
+          "updatedBy": "AI Triage Engine",
+          "timestamp": "2026-11-12T15:06:10.501Z"
+        },
+        {
+          "status": "Assigned",
+          "note": "Dispatched Rajesh Kumar with insulated PPE kit",
+          "updatedBy": "Dr. R. K. Sharma",
+          "timestamp": "2026-11-12T15:54:10.501Z"
+        },
+        {
+          "status": "In Progress",
+          "note": "Technician on-site. Main busbar isolated, replacing 32A MCB breaker.",
+          "updatedBy": "Rajesh Kumar",
+          "timestamp": "2026-11-12T16:54:10.501Z"
+        }
+      ],
+      "createdAt": "2026-11-12T14:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    },
+    {
+      "_id": "2ded5d80-f9da-4d1a-a047-e892981e30f7",
+      "complaintId": "JIMS-2026-1001",
+      "title": "Water continuously dripping from Split AC onto teacher desk in Lab 2",
+      "description": "The split AC unit in Computer Lab 2 has water leaking onto desk row 1. Students could slip and there is risk of water entering computer power strips.",
+      "category": "HVAC & Climate Control",
+      "priority": "High",
+      "status": "Assigned",
+      "location": {
+        "facilityId": "fac-1",
+        "facilityName": "Computer Lab 2 (AI & Cloud Lab)",
+        "building": "Block B",
+        "floor": "2nd Floor",
+        "room": "Lab 202",
+        "specificAsset": "AC-B2-02"
+      },
+      "reportedBy": {
+        "id": "user-student-1",
+        "name": "Varun Malik",
+        "email": "varun@jims.edu",
+        "role": "student"
+      },
+      "assignedTo": {
+        "id": "user-tech-1",
+        "name": "Rajesh Kumar (Sr. Electrical & HVAC Tech)",
+        "role": "technician",
+        "assignedAt": "2026-11-12T13:54:10.501Z"
+      },
+      "aiClassification": {
+        "category": "HVAC & Climate Control",
+        "confidence": 0.94,
+        "keywords": [
+          "ac",
+          "water",
+          "dripping",
+          "split ac",
+          "leaking"
+        ]
+      },
+      "aiPriority": {
+        "priority": "High",
+        "urgencyScore": 78.5,
+        "slaHours": 6,
+        "rationale": [
+          "High disruption keywords detected",
+          "Infrastructure impact baseline for HVAC",
+          "High student-density / Academic venue"
+        ],
+        "recommendedAction": "Inspect AC condensate drain line and clean evaporator tray"
+      },
+      "cvAnalysis": {
+        "detectedFault": "Water Leakage & Fluid Accumulation",
+        "confidence": 0.92,
+        "visualFeatures": "Condensate drip pattern detected along casing bottom seam",
+        "suggestedAction": "Clear drain tray siphon and check indoor level"
+      },
+      "history": [
+        {
+          "status": "Submitted",
+          "note": "Issue reported with photo by Varun Malik",
+          "updatedBy": "Varun Malik",
+          "timestamp": "2026-11-12T09:54:10.501Z"
+        },
+        {
+          "status": "Verified",
+          "note": "Verified by Facility Admin. High priority confirmed.",
+          "updatedBy": "Dr. R. K. Sharma",
+          "timestamp": "2026-11-12T11:54:10.501Z"
+        },
+        {
+          "status": "Assigned",
+          "note": "Assigned to HVAC technician Rajesh Kumar",
+          "updatedBy": "Dr. R. K. Sharma",
+          "timestamp": "2026-11-12T13:54:10.501Z"
+        }
+      ],
+      "createdAt": "2026-11-12T09:54:10.501Z",
+      "updatedAt": "2026-11-12T17:54:10.501Z"
+    }
+  ],
+  "maintenanceActions": [
+    {
+      "_id": "255bdd8a-eea5-4665-b599-04bd69cbf874",
+      "complaintId": "JIMS-2026-0108",
+      "technicianId": "tech-1",
+      "technicianName": "Campus Technician",
+      "actionTaken": "nknk",
+      "partsReplaced": [],
+      "costEstimated": 0,
+      "statusResult": "Resolved",
+      "remarks": "",
+      "completedAt": "2026-11-12T18:14:41.162Z",
+      "createdAt": "2026-11-12T18:14:41.162Z",
+      "updatedAt": "2026-11-12T18:14:41.163Z"
+    },
+    {
+      "_id": "9101c0e8-cb5b-433c-b4f7-4eb5b3de3692",
+      "complaintId": "JIMS-2026-1005",
+      "technicianId": "user-tech-2",
+      "technicianName": "Manoj Verma",
+      "actionTaken": "Replaced rusted M8 hex bolts on desk leg structure and installed heavy-duty anti-skid rubber feet.",
+      "partsReplaced": [
+        "M8x40mm Hex Screws (4 units)",
+        "Anti-skid rubber leveler pads"
+      ],
+      "costEstimated": 180,
+      "statusResult": "Resolved",
+      "remarks": "Desk now firm and stable.",
+      "completedAt": "2026-11-09T17:54:10.502Z",
+      "createdAt": "2026-11-12T17:54:10.502Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    },
+    {
+      "_id": "53d960a4-e063-4a67-9443-89fe2f50da17",
+      "complaintId": "JIMS-2026-1004",
+      "technicianId": "user-tech-1",
+      "technicianName": "Rajesh Kumar",
+      "actionTaken": "Disassembled projector housing, vacuumed dust accumulated on thermal sensor, installed brand new 230W OEM halogen lamp module, and reset lamp timer.",
+      "partsReplaced": [
+        "ELPLP96 Projector Lamp Module",
+        "Thermal Intake Dust Filter"
+      ],
+      "costEstimated": 3450,
+      "statusResult": "Resolved",
+      "remarks": "Projector brightness restored to 3500 ANSI lumens. Test projected for 45 minutes without heating alarm.",
+      "completedAt": "2026-11-12T05:54:10.502Z",
+      "createdAt": "2026-11-12T17:54:10.502Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    }
+  ],
+  "predictions": [],
+  "activityLogs": [
+    {
+      "_id": "42d29c24-3841-425c-a1bf-feaa2b63b92c",
+      "action": "COMPLAINT_CREATED",
+      "userId": "guest",
+      "userName": "Campus User",
+      "details": {
+        "complaintId": "JIMS-2026-0110",
+        "title": "Water dripping from AC in Lab 202",
+        "category": "HVAC & Climate Control",
+        "priority": "High"
+      },
+      "createdAt": "2026-11-12T18:17:41.053Z",
+      "updatedAt": "2026-11-12T18:17:41.053Z"
+    },
+    {
+      "_id": "76876eb2-c164-4ca2-ba38-4e6bd9a4ca38",
+      "action": "MAINTENANCE_ACTION_LOGGED",
+      "userId": "tech-1",
+      "userName": "Campus Technician",
+      "details": {
+        "complaintId": "JIMS-2026-0108",
+        "actionTaken": "nknk",
+        "statusResult": "Resolved"
+      },
+      "createdAt": "2026-11-12T18:14:41.164Z",
+      "updatedAt": "2026-11-12T18:14:41.164Z"
+    },
+    {
+      "_id": "29d9699f-7eb9-4beb-84ca-b2fe4e845a0b",
+      "action": "COMPLAINT_CREATED",
+      "userId": "guest",
+      "userName": "Campus User",
+      "details": {
+        "complaintId": "JIMS-2026-0109",
+        "title": "Air conditioner in Seminar Hall making loud grinding noise and not cooling",
+        "category": "HVAC & Climate Control",
+        "priority": "Medium"
+      },
+      "createdAt": "2026-11-12T18:14:18.294Z",
+      "updatedAt": "2026-11-12T18:14:18.294Z"
+    },
+    {
+      "_id": "6d4388c0-5e63-44f9-87b9-e896ba3c922b",
+      "action": "COMPLAINT_CREATED",
+      "userId": "guest",
+      "userName": "Campus User",
+      "details": {
+        "complaintId": "JIMS-2026-0108",
+        "title": "Switchboard sparking and burnt plastic odor near Lab 2 entrance",
+        "category": "Electrical & Power",
+        "priority": "Critical"
+      },
+      "createdAt": "2026-11-12T18:14:06.581Z",
+      "updatedAt": "2026-11-12T18:14:06.581Z"
+    },
+    {
+      "_id": "f2f249a4-0745-43f9-b6de-f94f93c46d28",
+      "action": "COMPLAINT_CREATED",
+      "userId": "guest",
+      "userName": "Campus User",
+      "details": {
+        "complaintId": "JIMS-2026-0107",
+        "title": "Test Issue",
+        "category": "Civil & Furniture",
+        "priority": "Medium"
+      },
+      "createdAt": "2026-11-12T18:12:29.328Z",
+      "updatedAt": "2026-11-12T18:12:29.328Z"
+    },
+    {
+      "_id": "6e0492cf-ba1b-4086-8a92-98279d28c954",
+      "action": "SYSTEM_INITIALIZED",
+      "userId": "system",
+      "userName": "JIMS Maintenance Engine",
+      "details": {
+        "version": "2.4.0",
+        "status": "Seeded successfully"
+      },
+      "createdAt": "2026-11-12T17:54:10.502Z",
+      "updatedAt": "2026-11-12T17:54:10.502Z"
+    }
+  ]
+}

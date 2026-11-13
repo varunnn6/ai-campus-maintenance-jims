@@ -1,0 +1,27 @@
+{
+  "name": "campus-maintenance-system",
+  "version": "1.0.0",
+  "description": "AI-Driven Predictive Campus Maintenance & Facility Management System (JIMS Rohini Sector-5, MCA Project)",
+  "scripts": {
+    "start": "bash start.sh",
+    "start:server": "node server/server.js",
+    "start:client": "cd client && npm run dev",
+    "start:ai": "python3 ai_service/app.py",
+    "train:ai": "python3 ai_service/train_models.py",
+    "test:ai": "cd ai_service && python3 test_service.py",
+    "build:client": "cd client && npm run build"
+  },
+  "keywords": [
+    "campus-maintenance",
+    "predictive-maintenance",
+    "facility-management",
+    "ai",
+    "machine-learning",
+    "computer-vision",
+    "mca-project",
+    "jims-rohini",
+    "ggsipu"
+  ],
+  "author": "Varun Malik, Shankar Sumar, Aditya (MCA Semester 3)",
+  "license": "ISC"
+}
