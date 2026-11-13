@@ -5,12 +5,11 @@ import {
   Clock, 
   TrendingUp, 
   Activity, 
-  ArrowUpRight,
-  ShieldAlert,
-  ArrowRight,
-  Sparkles,
-  Zap,
-  Building
+  ShieldAlert, 
+  ArrowRight, 
+  Sparkles, 
+  Zap, 
+  Building 
 } from 'lucide-react';
 
 export default function DashboardView({ 
@@ -71,33 +70,33 @@ export default function DashboardView({
   return (
     <div className="space-y-8">
       
-      {/* 🌟 HERO EXECUTIVE BANNER */}
+      {/* 🌟 HERO EXECUTIVE BANNER (Natural language, zero jargon) */}
       <div className="relative rounded-[32px] overflow-hidden glass-card border border-white/20 p-8 sm:p-12 shadow-[0_25px_60px_rgba(0,0,0,0.4)]">
         
-        {/* Internal lush gradient orb inside the hero */}
+        {/* Soft Ambient Aurora Glow */}
         <div 
           className="absolute -right-[10%] -top-[20%] w-[550px] h-[550px] rounded-full opacity-70 filter blur-[90px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(244,114,182,0.9) 0%, rgba(192,132,252,0.85) 40%, rgba(99,102,241,0.6) 70%, transparent 85%)'
+            background: 'radial-gradient(circle, rgba(244,114,182,0.85) 0%, rgba(192,132,252,0.8) 40%, rgba(99,102,241,0.55) 70%, transparent 85%)'
           }}
         />
 
         <div className="relative z-10 max-w-2xl space-y-4">
           
-          {/* Subtle Tag Pill */}
+          {/* Tag Pill */}
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass-pill border border-white/25 text-[11px] font-semibold text-slate-200">
             <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" />
-            <span>Autonomous Facility Intelligence</span>
+            <span>Campus Maintenance Overview</span>
           </div>
 
-          {/* Intelligent Headline */}
+          {/* Simple, clear headline */}
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.1]">
-            Predictive Operations. <br />
-            <span className="gradient-text-aura">Zero Downtime.</span>
+            Campus Facility Operations. <br />
+            <span className="gradient-text-aura">Fast & Reliable Repairs.</span>
           </h1>
 
           <p className="text-sm sm:text-base text-slate-300 font-normal leading-relaxed max-w-lg">
-            Transitioning campus facilities from reactive reporting to proactive, data-driven management through real-time ML risk scoring and automated defect triage.
+            Quickly report campus issues, assign work to technicians, and track repairs to completion with before-and-after photo proof.
           </p>
 
           {/* Action Pills */}
@@ -113,14 +112,14 @@ export default function DashboardView({
               className="px-5 py-2.5 rounded-full glass-pill text-xs font-semibold text-white hover:text-white transition-all cursor-pointer flex items-center gap-2"
             >
               <Zap className="w-3.5 h-3.5 text-amber-300" />
-              <span>Predictive Sandbox</span>
+              <span>Preventive Maintenance</span>
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* KPI Cards: Frosted Glass with delicate aura borders */}
+      {/* KPI Cards (Plain user language) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         
         {/* Active Issues */}
@@ -134,15 +133,15 @@ export default function DashboardView({
               {kpis.inProgress + kpis.pendingTriage}
             </span>
             <span className="text-[11px] text-slate-400 font-medium">
-              / {complaints.length} logged
+              / {complaints.length} total logged
             </span>
           </div>
         </div>
 
-        {/* Critical SLA */}
+        {/* Critical Attention */}
         <div className="p-5 rounded-2xl glass-card glass-card-hover border border-white/10 space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-            <span>Critical Priority</span>
+            <span>Urgent Attention</span>
             <ShieldAlert className="w-4 h-4 text-rose-400" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -150,7 +149,7 @@ export default function DashboardView({
               {kpis.criticalCount}
             </span>
             <span className="text-[11px] text-slate-400 font-medium">
-              +{kpis.highCount} elevated
+              +{kpis.highCount} high priority
             </span>
           </div>
         </div>
@@ -158,7 +157,7 @@ export default function DashboardView({
         {/* Resolution Rate */}
         <div className="p-5 rounded-2xl glass-card glass-card-hover border border-white/10 space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-            <span>Resolution Rate</span>
+            <span>Resolved Successfully</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -171,10 +170,10 @@ export default function DashboardView({
           </div>
         </div>
 
-        {/* MTTR */}
+        {/* Average Repair Time */}
         <div className="p-5 rounded-2xl glass-card glass-card-hover border border-white/10 space-y-2">
           <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-            <span>Mean Time to Resolve</span>
+            <span>Average Repair Time</span>
             <Clock className="w-4 h-4 text-amber-400" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -182,28 +181,28 @@ export default function DashboardView({
               {kpis.mttrHours}h
             </span>
             <span className="text-[11px] text-slate-400 font-medium">
-              target &lt; 24h
+              target: under 24 hours
             </span>
           </div>
         </div>
 
       </div>
 
-      {/* Main Grid: Recent Activity & Risk Radar */}
+      {/* Main Grid: Recent Issues & Attention Areas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Recent Issues List (2 Cols) */}
         <div className="lg:col-span-2 rounded-[24px] glass-card border border-white/15 overflow-hidden">
           <div className="p-5 border-b border-white/10 flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-white tracking-tight">Recent Incidents</h2>
-              <p className="text-xs text-slate-400">Real-time facility maintenance telemetry</p>
+              <h2 className="text-sm font-bold text-white tracking-tight">Recent Campus Issues</h2>
+              <p className="text-xs text-slate-400">Live feed of reported maintenance complaints</p>
             </div>
             <button
               onClick={onOpenReportModal}
-              className="px-3 py-1 rounded-full glass-pill text-xs text-fuchsia-300 hover:text-white font-semibold transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-sm"
             >
-              + Create
+              + Report Issue
             </button>
           </div>
 
@@ -246,16 +245,16 @@ export default function DashboardView({
           </div>
         </div>
 
-        {/* Right Column: Predictive Vulnerabilities & Domain Breakdown */}
+        {/* Right Column: Attention Needed & Breakdown */}
         <div className="space-y-6">
           
-          {/* Facility Risk Radar */}
+          {/* Areas Needing Attention */}
           <div className="p-5 rounded-[24px] glass-card border border-white/15 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-fuchsia-400" />
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                  Vulnerability Radar
+                  Areas Needing Attention
                 </h3>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-fuchsia-500/20 text-fuchsia-300 border border-fuchsia-500/30 font-semibold font-mono">
@@ -265,7 +264,7 @@ export default function DashboardView({
 
             <div className="space-y-3 pt-1">
               {highRiskAreas.length === 0 ? (
-                <div className="text-xs text-slate-400 text-center py-4">All monitored facilities optimal.</div>
+                <div className="text-xs text-slate-400 text-center py-4">All monitored facilities are in good condition.</div>
               ) : (
                 highRiskAreas.map((f) => {
                   const score = f.riskScore || 20;
@@ -274,7 +273,7 @@ export default function DashboardView({
                       <div className="flex items-center justify-between text-xs font-medium">
                         <span className="text-slate-200 truncate max-w-[170px]">{f.name}</span>
                         <span className={`text-[11px] font-mono font-bold ${score >= 60 ? 'text-rose-400' : 'text-slate-300'}`}>
-                          Risk {score}
+                          {f.activeIssuesCount > 0 ? `${f.activeIssuesCount} issues` : 'Inspection suggested'}
                         </span>
                       </div>
                       <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -290,10 +289,10 @@ export default function DashboardView({
             </div>
           </div>
 
-          {/* Domain Category Distribution */}
+          {/* Issues by Category */}
           <div className="p-5 rounded-[24px] glass-card border border-white/15 space-y-3">
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              Domain Breakdown
+              Issues by Category
             </h3>
             <div className="space-y-2.5 pt-1">
               {Object.entries(categoryCounts).slice(0, 5).map(([cat, count]) => {

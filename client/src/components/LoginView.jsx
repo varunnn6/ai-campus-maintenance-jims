@@ -47,7 +47,7 @@ export default function LoginView({ onLoginSuccess }) {
       email: 'technician@jims.edu',
       password: 'tech123',
       icon: Wrench,
-      desc: 'View AI-routed trade orders, accept jobs & upload completion proofs'
+      desc: 'View work orders by trade, claim jobs, and upload repair photo proof'
     },
     {
       role: 'admin',
@@ -56,7 +56,7 @@ export default function LoginView({ onLoginSuccess }) {
       email: 'admin@jims.edu',
       password: 'admin123',
       icon: ShieldCheck,
-      desc: 'Full campus oversight, dispatch management, predictive radar & member creation'
+      desc: 'Full campus overview, assign technicians, monitor maintenance & manage members'
     }
   ];
 
@@ -207,7 +207,7 @@ export default function LoginView({ onLoginSuccess }) {
             Campus<span className="gradient-text-aura">Ops</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto">
-            Campus Facility & Infrastructure Management System with AI defect routing and verified repair tracking.
+            Campus facility maintenance system to report issues, dispatch technicians, and track repairs with photo proof.
           </p>
         </div>
 
@@ -406,7 +406,7 @@ export default function LoginView({ onLoginSuccess }) {
         {/* Footer */}
         <div className="text-center pt-2">
           <p className="text-[11px] text-slate-500">
-            JIMS Rohini Sector-5 Autonomous Facility Management • Cloud Firestore & Computer Vision AI
+            JIMS Rohini Sector-5 Campus Maintenance & Facility Operations System
           </p>
         </div>
 

@@ -74,7 +74,7 @@ export default function StudentPortalView({
           </h1>
           
           <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            {program} • Report maintenance issues across campus buildings, labs, and canteens with instant AI routing and real-time photo verification.
+            {program} • Report maintenance issues in classrooms, labs, or canteens, and track technician repair progress with photo proof.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export default function StudentPortalView({
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-lg shadow-white/20 active:scale-95"
           >
             <Camera className="w-4 h-4 text-fuchsia-600" />
-            <span>Report Defect with Photo</span>
+            <span>Report an Issue</span>
           </button>
         </div>
 

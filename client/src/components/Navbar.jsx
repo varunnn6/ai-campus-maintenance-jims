@@ -56,9 +56,9 @@ export default function Navbar({
       case 'admin':
       default:
         return [
-          { id: 'dashboard', label: 'Executive Overview', icon: Layers },
-          { id: 'complaints', label: 'Dispatch & Incidents', icon: AlertCircle },
-          { id: 'predictive', label: 'Predictive Radar', icon: Activity }
+          { id: 'dashboard', label: 'Overview', icon: Layers },
+          { id: 'complaints', label: 'Campus Incidents', icon: AlertCircle },
+          { id: 'predictive', label: 'Preventive Care', icon: Activity }
         ];
     }
   };
