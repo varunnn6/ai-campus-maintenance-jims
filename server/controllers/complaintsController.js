@@ -159,7 +159,31 @@ export const getComplaintById = async (req, res) => {
     if (!complaint) {
       return res.status(404).json({ message: 'Complaint not found' });
     }
-    return res.json(complaint);
+
+    // Check for repeat / recurring breakdowns in the same location
+    const allComplaints = await Complaint.find();
+    const room = complaint.location?.room;
+    const cat = complaint.category;
+    const repeatCount = allComplaints.filter(c => 
+      c.location?.room && room && c.location.room.toLowerCase() === room.toLowerCase() &&
+      c.category === cat
+    ).length;
+
+    let recurrenceAlert = null;
+    if (repeatCount >= 2) {
+      recurrenceAlert = {
+        isRecurring: true,
+        occurrences: repeatCount,
+        actionRecommendation: repeatCount >= 3 ? 'REPLACE_EQUIPMENT' : 'ROOT_CAUSE_INSPECTION',
+        badge: repeatCount >= 3 ? 'Replacement Recommended (Stop Quick Patching)' : 'Repeat Issue Warning',
+        title: repeatCount >= 3 ? 'Frequent Breakdown — Equipment Replacement Advised' : 'Recurring Issue in this Space',
+        message: repeatCount >= 3
+          ? `This equipment in ${complaint.location?.building} ${complaint.location?.room} has broken down ${repeatCount} times. Repeated patch repairs are costing more than replacement. Administrator is advised to issue a full replacement order.`
+          : `This is the ${repeatCount}nd time an issue has been reported in this room. Technician should check for root-cause issues to avoid continuous breakdowns.`
+      };
+    }
+
+    return res.json({ ...complaint, recurrenceAlert });
   } catch (err) {
     return res.status(500).json({ message: 'Error retrieving complaint', error: err.message });
   }

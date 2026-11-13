@@ -53,6 +53,7 @@ export default function App() {
 
   // Modals
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportModalInitialData, setReportModalInitialData] = useState(null);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
@@ -158,8 +159,18 @@ export default function App() {
   };
 
   const handleGenerateWorkOrder = (cluster) => {
+    setReportModalInitialData({
+      title: `[REPLACEMENT ORDER] Complete Replacement for ${cluster.room || 'Facility'} ${cluster.domain || ''}`,
+      description: `Frequent breakdown alert (${cluster.occurrences || 3} failures recorded). Routine patch repairs are no longer cost-effective.\n\nRecommended Action: ${cluster.replacementAdvice?.suggestedSolution || 'Authorize complete replacement and new installation.'}\n\nCost-Benefit Justification: ${cluster.replacementAdvice?.whyReplace || 'Ongoing repairs exceed replacement lifecycle value.'}`,
+      building: cluster.building || 'Building B',
+      roomNumber: cluster.room || 'B202',
+      category: cluster.domain?.includes('HVAC') ? 'HVAC & Climate Control' :
+                cluster.domain?.includes('Electrical') ? 'Electrical & Power' :
+                cluster.domain?.includes('Plumbing') ? 'Plumbing & Water Supply' :
+                cluster.domain?.includes('IT') ? 'IT & Computer Labs' : 'Electrical & Power'
+    });
     setIsReportModalOpen(true);
-    showToast(`Pre-emptive order template loaded for ${cluster.building} ${cluster.room}`);
+    showToast(`Replacement order form prepared for ${cluster.building} ${cluster.room}`);
   };
 
   // If user is not authenticated, render Login Page
@@ -276,10 +287,15 @@ export default function App() {
                     trendData={trendData}
                     riskHeatmap={riskHeatmap}
                     complaints={complaints}
+                    recurringClusters={recurringClusters}
                     onSelectComplaint={(c) => setSelectedComplaint(c)}
                     onRefresh={fetchData}
-                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                    onOpenReportModal={() => {
+                      setReportModalInitialData(null);
+                      setIsReportModalOpen(true);
+                    }}
                     onOpenPredictive={() => setActiveTab('predictive')}
+                    onGenerateWorkOrder={handleGenerateWorkOrder}
                   />
                 )}
 
@@ -287,7 +303,10 @@ export default function App() {
                   <ComplaintsListView
                     complaints={complaints}
                     onSelectComplaint={(c) => setSelectedComplaint(c)}
-                    onOpenReportModal={() => setIsReportModalOpen(true)}
+                    onOpenReportModal={() => {
+                      setReportModalInitialData(null);
+                      setIsReportModalOpen(true);
+                    }}
                   />
                 )}
 
@@ -322,11 +341,15 @@ export default function App() {
       {/* Modals */}
       <ReportIssueModal
         isOpen={isReportModalOpen}
-        onClose={() => setIsReportModalOpen(false)}
+        onClose={() => {
+          setIsReportModalOpen(false);
+          setReportModalInitialData(null);
+        }}
         currentRole={currentRole}
         onComplaintCreated={handleComplaintCreated}
         onFacilityAdded={handleFacilityAdded}
         existingFacilities={facilities}
+        initialData={reportModalInitialData}
       />
 
       <ComplaintDetailModal

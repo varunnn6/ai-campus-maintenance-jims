@@ -111,7 +111,8 @@ export default function ReportIssueModal({
   currentRole, 
   onComplaintCreated,
   onFacilityAdded,
-  existingFacilities = []
+  existingFacilities = [],
+  initialData = null
 }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -135,6 +136,18 @@ export default function ReportIssueModal({
   const [mediaType, setMediaType] = useState('image'); // 'image' or 'video'
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  // Prefill initialData when provided (e.g. from Recurring Replacement Advisor)
+  useEffect(() => {
+    if (initialData && isOpen) {
+      if (initialData.title) setTitle(initialData.title);
+      if (initialData.description) setDescription(initialData.description);
+      if (initialData.category) setCategory(initialData.category);
+      if (initialData.building) setBuilding(initialData.building);
+      if (initialData.floor) setFloor(initialData.floor);
+      if (initialData.roomNumber) setSelectedRoomCode(initialData.roomNumber);
+    }
+  }, [initialData, isOpen]);
 
   // Get available rooms for chosen building & floor
   const presetRooms = PRESET_LOCATIONS[building]?.[floor] || [];

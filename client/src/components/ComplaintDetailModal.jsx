@@ -16,7 +16,8 @@ import {
   History,
   Sparkles,
   Upload,
-  Check
+  Check,
+  RefreshCw
 } from 'lucide-react';
 
 const STATUS_STEPS = ['Submitted', 'Verified', 'Assigned', 'In Progress', 'Resolved', 'Closed'];
@@ -234,6 +235,42 @@ export default function ComplaintDetailModal({
           {/* Left 2 Cols: Details, Photos, History */}
           <div className="lg:col-span-2 space-y-5">
             
+            {/* Recurring Problem & Complete Replacement Advisor Banner */}
+            {(complaint.recurrenceAlert || (complaint.occurrences && complaint.occurrences >= 2)) && (
+              <div className={`p-4 rounded-2xl border ${
+                (complaint.recurrenceAlert?.isReplacementCandidate || (complaint.occurrences && complaint.occurrences >= 3))
+                  ? 'bg-rose-500/10 border-rose-500/30'
+                  : 'bg-amber-500/10 border-amber-500/30'
+              } space-y-2.5`}>
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    (complaint.recurrenceAlert?.isReplacementCandidate || (complaint.occurrences && complaint.occurrences >= 3))
+                      ? 'bg-rose-500 text-white shadow-md shadow-rose-500/30'
+                      : 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
+                  }`}>
+                    <RefreshCw className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider block ${
+                      (complaint.recurrenceAlert?.isReplacementCandidate || (complaint.occurrences && complaint.occurrences >= 3))
+                        ? 'text-rose-400'
+                        : 'text-amber-400'
+                    }`}>
+                      {(complaint.recurrenceAlert?.isReplacementCandidate || (complaint.occurrences && complaint.occurrences >= 3))
+                        ? 'Repeat Problem • Complete Replacement Advised'
+                        : 'Frequent Breakdown Notice'}
+                    </span>
+                    <h4 className="text-xs sm:text-sm font-semibold text-white">
+                      {complaint.recurrenceAlert?.headline || `Reported ${complaint.occurrences || 2} times in ${complaint.roomNumber || 'this location'}`}
+                    </h4>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {complaint.recurrenceAlert?.recommendation || 'This unit/location breaks down repeatedly. Continuous patch repairs cost more than permanent replacement. The campus administrator is advised to approve a complete replacement rather than another routine repair.'}
+                </p>
+              </div>
+            )}
+
             {/* Description Card */}
             <div className="p-5 rounded-2xl glass-card border border-white/10 space-y-3">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
