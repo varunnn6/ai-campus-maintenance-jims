@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from './api.js';
 import Navbar from './components/Navbar.jsx';
+import LoginView from './components/LoginView.jsx';
 import DashboardView from './components/DashboardView.jsx';
 import ComplaintsListView from './components/ComplaintsListView.jsx';
 import PredictiveMaintenanceHub from './components/PredictiveMaintenanceHub.jsx';
@@ -16,8 +17,30 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [currentRole, setCurrentRole] = useState('student');
-  const [activeTab, setActiveTab] = useState('my-requests');
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('campus_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const [currentRole, setCurrentRole] = useState(() => {
+    try {
+      const saved = localStorage.getItem('campus_user');
+      if (saved) {
+        const u = JSON.parse(saved);
+        return u.role || 'student';
+      }
+    } catch (e) {}
+    return 'student';
+  });
+
+  const [activeTab, setActiveTab] = useState(() => {
+    return (currentRole === 'technician') ? 'tech-assigned' : (currentRole === 'admin') ? 'dashboard' : 'my-requests';
+  });
 
   // Data states
   const [complaints, setComplaints] = useState([]);
@@ -82,6 +105,22 @@ export default function App() {
     fetchData();
   }, []);
 
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    setCurrentRole(user.role || 'student');
+    if (user.role === 'technician') setActiveTab('tech-assigned');
+    else if (user.role === 'admin') setActiveTab('dashboard');
+    else setActiveTab('my-requests');
+    showToast(`Welcome, ${user.name}!`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('campus_user');
+    localStorage.removeItem('campus_token');
+    setCurrentUser(null);
+    showToast('Signed out successfully');
+  };
+
   const handleRoleChange = (role) => {
     setCurrentRole(role);
     if (role === 'student' || role === 'staff') {
@@ -102,6 +141,11 @@ export default function App() {
     fetchData();
   };
 
+  const handleFacilityAdded = (newFacility) => {
+    setFacilities(prev => [newFacility, ...prev]);
+    showToast(`New room ${newFacility.roomNumber} (${newFacility.block}) saved to directory!`);
+  };
+
   const handleStatusUpdated = (updatedComplaint) => {
     setComplaints(prev => prev.map(c => 
       (c._id === updatedComplaint._id || c.complaintId === updatedComplaint.complaintId) ? updatedComplaint : c
@@ -115,6 +159,11 @@ export default function App() {
     setIsReportModalOpen(true);
     showToast(`Pre-emptive order template loaded for ${cluster.building} ${cluster.room}`);
   };
+
+  // If user is not authenticated, render Login Page
+  if (!currentUser) {
+    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div className="relative min-h-screen bg-[#07080B] text-slate-100 flex flex-col font-sans selection:bg-fuchsia-500 selection:text-white overflow-hidden">
@@ -150,7 +199,7 @@ export default function App() {
 
       {/* Toast notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-full glass-card border border-white/20 text-white text-xs shadow-2xl backdrop-blur-2xl">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-3 px-4 sm:px-5 py-2.5 sm:py-3 rounded-full glass-card border border-white/20 text-white text-xs shadow-2xl backdrop-blur-2xl">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span className="font-medium tracking-wide">{toastMessage.msg}</span>
         </div>
@@ -161,6 +210,8 @@ export default function App() {
         <Navbar
           currentRole={currentRole}
           setCurrentRole={handleRoleChange}
+          currentUser={currentUser}
+          onLogout={handleLogout}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           onOpenReportModal={() => setIsReportModalOpen(true)}
@@ -169,14 +220,14 @@ export default function App() {
       </div>
 
       {/* Main Content Area */}
-      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 md:py-8">
+      <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
         {loading ? (
-          <div className="h-96 flex flex-col items-center justify-center gap-4">
+          <div className="h-80 sm:h-96 flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 rounded-2xl glass-card flex items-center justify-center">
               <Loader2 className="w-6 h-6 text-fuchsia-400 animate-spin" />
             </div>
             <p className="text-xs text-slate-400 font-medium tracking-wide">
-              Loading tailored interface...
+              Loading operational metrics...
             </p>
           </div>
         ) : (
@@ -262,16 +313,16 @@ export default function App() {
       </main>
 
       {/* Frosted Glass Minimal Footer */}
-      <footer className="relative z-10 border-t border-white/[0.08] bg-black/20 backdrop-blur-xl py-6 px-4 text-xs text-slate-400">
+      <footer className="relative z-10 border-t border-white/[0.08] bg-black/20 backdrop-blur-xl py-5 px-4 text-xs text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center sm:justify-start gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-semibold text-slate-200 tracking-tight">CampusOps</span>
             <span className="text-slate-500">•</span>
-            <span className="text-slate-400">Role-Adaptive Facility Management</span>
+            <span className="text-slate-400">JIMS Rohini Sector-5</span>
           </div>
           <div className="text-[11px] text-slate-400">
-            Jagan Institute of Management Studies (JIMS Rohini) • Varun Malik, Shankar Sumar & Aditya
+            MCA Semester 3 Academic Project • Varun Malik, Shankar Sumar & Aditya
           </div>
         </div>
       </footer>
@@ -282,6 +333,8 @@ export default function App() {
         onClose={() => setIsReportModalOpen(false)}
         currentRole={currentRole}
         onComplaintCreated={handleComplaintCreated}
+        onFacilityAdded={handleFacilityAdded}
+        existingFacilities={facilities}
       />
 
       <ComplaintDetailModal

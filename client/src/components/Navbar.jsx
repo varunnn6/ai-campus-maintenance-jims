@@ -12,12 +12,15 @@ import {
   Wrench,
   User,
   ListTodo,
-  Inbox
+  Inbox,
+  LogOut
 } from 'lucide-react';
 
 export default function Navbar({ 
   currentRole, 
   setCurrentRole, 
+  currentUser,
+  onLogout,
   activeTab, 
   setActiveTab, 
   onOpenReportModal, 
@@ -57,6 +60,7 @@ export default function Navbar({
   ];
 
   const currentRoleObj = roles.find(r => r.id === currentRole) || roles[0];
+  const displayName = currentUser?.name || currentRoleObj.name;
 
   // Dynamic Navigation Items Tailored Specifically to Role Capabilities
   const getNavItems = () => {
@@ -66,7 +70,7 @@ export default function Navbar({
         return [
           { id: 'my-requests', label: 'My Submissions', icon: Inbox },
           { id: 'all-issues', label: 'Campus Feed', icon: AlertCircle },
-          { id: 'facilities', label: 'Facility Status', icon: Building2 },
+          { id: 'facilities', label: 'Facility Directory', icon: Building2 },
         ];
       case 'technician':
         return [
@@ -88,33 +92,33 @@ export default function Navbar({
   const navItems = getNavItems();
 
   return (
-    <header className="sticky top-4 z-40 max-w-7xl mx-auto px-4 sm:px-6">
-      <div className="h-16 rounded-full glass-card border border-white/15 px-4 sm:px-6 flex items-center justify-between gap-4 shadow-[0_15px_35px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
+    <header className="sticky top-2 sm:top-4 z-40 max-w-7xl mx-auto px-3 sm:px-6">
+      <div className="h-14 sm:h-16 rounded-full glass-card border border-white/15 px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 shadow-[0_15px_35px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
         
         {/* Brand */}
         <div 
-          className="flex items-center gap-3 cursor-pointer" 
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer shrink-0" 
           onClick={() => {
             if (currentRole === 'student' || currentRole === 'staff') setActiveTab('my-requests');
             else if (currentRole === 'technician') setActiveTab('tech-assigned');
             else setActiveTab('dashboard');
           }}
         >
-          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-fuchsia-500 via-violet-500 to-amber-300 p-[1px] shadow-lg shadow-fuchsia-500/20">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-fuchsia-500 via-violet-500 to-amber-300 p-[1px] shadow-lg shadow-fuchsia-500/20">
             <div className="w-full h-full rounded-full bg-[#0E0F15] flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-fuchsia-300" />
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-fuchsia-300" />
             </div>
           </div>
           <div>
-            <span className="font-bold text-sm tracking-tight text-white block">CampusOps</span>
+            <span className="font-bold text-xs sm:text-sm tracking-tight text-white block">CampusOps</span>
             <span className="hidden sm:block text-[10px] text-slate-400 font-medium tracking-wide">
-              {currentRoleObj.label} Portal
+              {currentRoleObj.label} Mode
             </span>
           </div>
         </div>
 
         {/* Dynamic Center Navigation */}
-        <nav className="hidden md:flex items-center p-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
+        <nav className="hidden lg:flex items-center p-1 rounded-full bg-white/[0.04] border border-white/[0.08]">
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -136,7 +140,7 @@ export default function Navbar({
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           
           {/* Docs Pill */}
           <button
@@ -152,14 +156,14 @@ export default function Navbar({
           <div className="relative">
             <button
               onClick={() => setRoleMenuOpen(!roleMenuOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer"
             >
-              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${currentRoleObj.color} animate-pulse`} />
-              <div className="text-left">
-                <span className="hidden sm:inline">{currentRoleObj.name}</span>
+              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${currentRoleObj.color} animate-pulse shrink-0`} />
+              <div className="text-left truncate max-w-[100px] sm:max-w-none">
+                <span className="hidden sm:inline">{displayName}</span>
                 <span className="sm:hidden">{currentRoleObj.label}</span>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             </button>
 
             {roleMenuOpen && (
@@ -170,7 +174,7 @@ export default function Navbar({
                 />
                 <div className="absolute right-0 mt-3 w-64 rounded-2xl glass-card border border-white/20 shadow-2xl p-2 z-50 space-y-1 backdrop-blur-2xl">
                   <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                    Switch User Role & Permissions
+                    Switch User Role
                   </div>
                   {roles.map(r => (
                     <button
@@ -200,20 +204,47 @@ export default function Navbar({
                       {currentRole === r.id && <Check className="w-3.5 h-3.5 text-fuchsia-400" />}
                     </button>
                   ))}
+                  
+                  {/* Logout item */}
+                  {onLogout && (
+                    <div className="pt-1 border-t border-white/10">
+                      <button
+                        onClick={() => {
+                          setRoleMenuOpen(false);
+                          onLogout();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left text-xs text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Sign Out of Portal</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
           </div>
 
-          {/* Action Button: Students/Staff/Admin get Report Issue, Tech gets Quick Refresh */}
+          {/* Action Button: Students/Staff/Admin get Report Issue */}
           {(currentRole === 'student' || currentRole === 'staff' || currentRole === 'admin') && (
             <button
               onClick={onOpenReportModal}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-lg shadow-white/20 active:scale-95"
+              className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-lg shadow-white/20 active:scale-95 shrink-0"
             >
-              <Plus className="w-4 h-4 text-slate-900" />
+              <Plus className="w-3.5 h-3.5 text-slate-900" />
               <span className="hidden sm:inline">Report Issue</span>
               <span className="sm:hidden">Report</span>
+            </button>
+          )}
+
+          {/* Logout button */}
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="p-1.5 sm:p-2 rounded-full glass-pill text-slate-400 hover:text-white transition-colors cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
             </button>
           )}
 
@@ -221,8 +252,8 @@ export default function Navbar({
 
       </div>
 
-      {/* Mobile nav strip */}
-      <div className="md:hidden flex items-center justify-around mt-2 p-1.5 rounded-full glass-card border border-white/10">
+      {/* Mobile nav strip (Touch optimized) */}
+      <div className="lg:hidden flex items-center justify-around mt-2 p-1 rounded-full glass-card border border-white/10">
         {navItems.map(item => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
