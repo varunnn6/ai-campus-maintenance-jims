@@ -2,14 +2,26 @@
   "name": "campus-maintenance-system",
   "version": "1.0.0",
   "description": "AI-Driven Predictive Campus Maintenance & Facility Management System (JIMS Rohini Sector-5, MCA Project)",
+  "type": "module",
   "scripts": {
-    "start": "bash start.sh",
+    "start": "node server/server.js",
+    "postinstall": "cd server && npm install",
     "start:server": "node server/server.js",
     "start:client": "cd client && npm run dev",
     "start:ai": "python3 ai_service/app.py",
     "train:ai": "python3 ai_service/train_models.py",
     "test:ai": "cd ai_service && python3 test_service.py",
     "build:client": "cd client && npm run build"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase-admin": "^14.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1"
   },
   "keywords": [
     "campus-maintenance",

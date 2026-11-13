@@ -35,6 +35,12 @@ npm-debug.log*
 .vscode/
 .idea/
 
+# Firebase
+server/serviceAccount.json
+.firebase/
+firebase-debug.log
+
 # Misc
 *.swp
 *.swo
+

@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { connectDB } from './config/db.js';
+import { connectFirestore } from './config/firebase.js';
 import apiRoutes from './routes/api.js';
 import { seedDatabaseIfEmpty } from './seed.js';
 
@@ -64,7 +64,7 @@ app.use((err, req, res, next) => {
 // Start Server
 const startServer = async () => {
   try {
-    await connectDB();
+    await connectFirestore();
     await seedDatabaseIfEmpty();
 
     app.listen(PORT, () => {
