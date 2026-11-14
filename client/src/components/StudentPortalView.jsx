@@ -29,10 +29,16 @@ export default function StudentPortalView({
   // Filter complaints reported by this specific student/user
   const myComplaints = complaints.filter(c => {
     if (!currentUser) return false;
+    // Match by DB id
     if (currentUser._id && c.reportedBy?.id === currentUser._id) return true;
+    // Match by enrollment number (most reliable for students)
     if (currentUser.enrollmentNumber && c.reportedBy?.enrollmentNumber === currentUser.enrollmentNumber) return true;
-    if (currentUser.name && c.reportedBy?.name && c.reportedBy.name.toLowerCase() === currentUser.name.toLowerCase()) return true;
-    if (currentUser.email && c.reportedBy?.email && c.reportedBy.email.toLowerCase() === currentUser.email.toLowerCase()) return true;
+    // Match by name (case-insensitive)
+    if (currentUser.name && c.reportedBy?.name && 
+        c.reportedBy.name.toLowerCase() === currentUser.name.toLowerCase()) return true;
+    // Match by email
+    if (currentUser.email && c.reportedBy?.email && 
+        c.reportedBy.email.toLowerCase() === currentUser.email.toLowerCase()) return true;
     return false;
   });
 

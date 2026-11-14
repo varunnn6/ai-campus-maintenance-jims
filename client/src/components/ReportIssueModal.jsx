@@ -109,6 +109,7 @@ export default function ReportIssueModal({
   isOpen, 
   onClose, 
   currentRole, 
+  currentUser,
   onComplaintCreated,
   onFacilityAdded,
   existingFacilities = [],
@@ -276,6 +277,7 @@ export default function ReportIssueModal({
       }] : [];
 
       // Create Complaint in backend
+      const token = localStorage.getItem('campus_token');
       const payload = {
         title,
         description,
@@ -289,19 +291,35 @@ export default function ReportIssueModal({
         },
         images: imagesPayload,
         aiClassification: aiAnalysis,
-        aiPriority: priorityData
+        aiPriority: priorityData,
+        // Explicitly include reporter so the backend saves real identity
+        reporterName: currentUser?.name || null,
+        reporterEmail: currentUser?.email || null,
+        reporterEnrollment: currentUser?.enrollmentNumber || null,
+        reporterId: currentUser?._id || null,
       };
 
-      const newComplaint = await apiRequest('/complaints', {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        // Fallback: send role + identity hints via headers
+        headers['x-demo-role'] = currentRole;
+        if (currentUser?.name) headers['x-demo-name'] = currentUser.name;
+        if (currentUser?.email) headers['x-demo-email'] = currentUser.email;
+        if (currentUser?.enrollmentNumber) headers['x-demo-enrollment'] = currentUser.enrollmentNumber;
+      }
+
+      const responseData = await apiRequest('/complaints', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-demo-role': currentRole 
-        },
+        headers,
         body: JSON.stringify(payload)
       });
 
-      if (onComplaintCreated && newComplaint) {
+      // Backend returns { message, complaint } — unwrap the actual complaint object
+      const newComplaint = responseData?.complaint || responseData;
+
+      if (onComplaintCreated && newComplaint && newComplaint.complaintId) {
         onComplaintCreated(newComplaint);
       }
 

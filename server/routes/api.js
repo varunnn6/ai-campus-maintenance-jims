@@ -5,7 +5,7 @@ import * as facilitiesCtrl from '../controllers/facilitiesController.js';
 import * as maintenanceCtrl from '../controllers/maintenanceController.js';
 import * as analyticsCtrl from '../controllers/analyticsController.js';
 import * as aiCtrl from '../controllers/aiBridgeController.js';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, softAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.post('/ai/predictive-maintenance', aiCtrl.getPredictiveInsights);
 // --- Complaints Routes ---
 router.get('/complaints', complaintsCtrl.getComplaints);
 router.get('/complaints/:id', complaintsCtrl.getComplaintById);
-router.post('/complaints', complaintsCtrl.createComplaint);
+router.post('/complaints', softAuth, complaintsCtrl.createComplaint);  // softAuth: attaches identity if available but never blocks
 router.patch('/complaints/:id/status', complaintsCtrl.updateStatus);
 router.patch('/complaints/:id/assign', complaintsCtrl.assignTechnician);
 router.post('/complaints/:id/feedback', complaintsCtrl.submitFeedback);

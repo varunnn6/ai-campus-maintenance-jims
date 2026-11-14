@@ -411,6 +411,7 @@ export default function App() {
           setReportModalInitialData(null);
         }}
         currentRole={currentRole}
+        currentUser={currentUser}
         onComplaintCreated={handleComplaintCreated}
         onFacilityAdded={handleFacilityAdded}
         existingFacilities={facilities}

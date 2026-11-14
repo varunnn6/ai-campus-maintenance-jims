@@ -36,7 +36,12 @@ export const createComplaint = async (req, res) => {
       images = [],
       aiClassification,
       aiPriority,
-      cvAnalysis
+      cvAnalysis,
+      // Explicit reporter fields sent from frontend when no JWT token
+      reporterName,
+      reporterEmail,
+      reporterEnrollment,
+      reporterId
     } = req.body;
 
     if (!title || !description) {
@@ -47,12 +52,16 @@ export const createComplaint = async (req, res) => {
     const finalCategory = category || aiClassification?.category || 'Civil & Furniture';
     const targetTrade = mapCategoryToTrade(finalCategory);
 
-    const reporter = req.user || {
-      _id: 'guest',
-      name: 'Campus User',
-      email: 'user@jims.edu',
-      role: 'student'
-    };
+    // Build reporter: prefer JWT-verified user, then explicit body fields, then guest fallback
+    const reporter = req.user && req.user.name && req.user.name !== 'Campus User'
+      ? req.user
+      : {
+          _id: reporterId || req.user?._id || 'guest',
+          name: reporterName || req.user?.name || 'Campus User',
+          email: reporterEmail || req.user?.email || 'user@jims.edu',
+          role: req.user?.role || 'student',
+          enrollmentNumber: reporterEnrollment || req.user?.enrollmentNumber || null
+        };
 
     const newComplaint = await Complaint.create({
       complaintId,
@@ -76,7 +85,8 @@ export const createComplaint = async (req, res) => {
         id: reporter._id || reporter.id,
         name: reporter.name,
         email: reporter.email,
-        role: reporter.role
+        role: reporter.role,
+        enrollmentNumber: reporter.enrollmentNumber || null
       },
       images: images || [],
       aiClassification: aiClassification || null,
