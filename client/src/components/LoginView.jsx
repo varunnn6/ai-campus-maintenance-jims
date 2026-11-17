@@ -274,7 +274,6 @@ export default function LoginView({ onLoginSuccess }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
                   <span>Enrollment Number / Username *</span>
-                  <span className="text-[10px] text-slate-400 font-mono">00114004425_StudentName</span>
                 </label>
                 <div className="relative">
                   <input
@@ -282,7 +281,7 @@ export default function LoginView({ onLoginSuccess }) {
                     required
                     value={studentIdentifier}
                     onChange={(e) => setStudentIdentifier(e.target.value)}
-                    placeholder="e.g. 01514004425 or 01514004425_Varun Malik"
+                    placeholder="e.g. 00114004425"
                     className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono"
                   />
                 </div>
@@ -300,26 +299,14 @@ export default function LoginView({ onLoginSuccess }) {
                     required
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value.toUpperCase())}
-                    placeholder="e.g. SUNIL MALIK"
+                    placeholder="e.g. VIKRAM CHOPRA"
                     className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono tracking-wider uppercase"
                   />
                   <Lock className="w-4 h-4 text-slate-500 absolute right-4 top-3.5 pointer-events-none" />
                 </div>
               </div>
 
-              {/* Guidelines helper box */}
-              <div className="p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] text-[11px] text-slate-400 space-y-1">
-                <div className="font-semibold text-slate-300 flex items-center gap-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-fuchsia-400" />
-                  <span>Student Credentials Format</span>
-                </div>
-                <p>
-                  • Username: <span className="text-slate-200 font-mono">enrollmentno_studentname</span> (e.g. <span className="text-slate-200 font-mono">00114004425_Priyanshu Mohta</span> or enrollment number <span className="text-slate-200 font-mono">00114004425</span>).
-                </p>
-                <p>
-                  • Password: Your official registered <span className="text-slate-200 font-semibold">Father's Name in ALL CAPS</span> (e.g. <span className="text-slate-200 font-mono">SANDEEP MOHTA</span>).
-                </p>
-              </div>
+              {/* Guidelines helper box — removed per user request */}
 
               {/* Submit Button */}
               <button
