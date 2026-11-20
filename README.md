@@ -3,7 +3,7 @@
 **Jagan Institute of Management Studies (JIMS), Sector-5, Rohini, Delhi – 110085**  
 *Affiliated to Guru Gobind Singh Indraprastha University (GGSIPU)*  
 **Programme:** Master of Computer Applications (MCA) – Semester 3  
-**Submitted By:** Varun Malik, Shankar Sumar & Aditya  
+**Submitted By:** Varun Malik, Shankar Suman, Aditya % Ayush Mishra
 **Academic Session:** 2025–2027  
 
 ---
