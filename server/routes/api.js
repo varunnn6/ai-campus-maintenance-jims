@@ -24,6 +24,7 @@ router.post('/ai/predictive-maintenance', aiCtrl.getPredictiveInsights);
 
 // --- Complaints Routes ---
 router.get('/complaints', complaintsCtrl.getComplaints);
+router.get('/complaints/recommendations', complaintsCtrl.getRecommendations);
 router.get('/complaints/:id', complaintsCtrl.getComplaintById);
 router.post('/complaints', softAuth, complaintsCtrl.createComplaint);  // softAuth: attaches identity if available but never blocks
 router.patch('/complaints/:id/status', complaintsCtrl.updateStatus);

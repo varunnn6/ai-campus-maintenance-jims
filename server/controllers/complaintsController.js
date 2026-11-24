@@ -347,3 +347,55 @@ export const submitFeedback = async (req, res) => {
     return res.status(500).json({ message: 'Error submitting feedback', error: err.message });
   }
 };
+
+// Smart location-based recommendation system
+// Returns the top frequently-reported problems for a given building/floor/room
+export const getRecommendations = async (req, res) => {
+  try {
+    const { building, floor, room } = req.query;
+
+    if (!building) {
+      return res.json([]);
+    }
+
+    // Build a progressive location filter: narrow as more info is provided
+    const filter = { 'location.building': building };
+    if (floor) filter['location.floor'] = floor;
+    if (room) filter['location.room'] = room;
+
+    // Fetch matching complaints (limit to recent 500 for performance)
+    const complaints = await Complaint.find(filter)
+      .select('title description category location')
+      .limit(500)
+      .lean();
+
+    if (!complaints.length) return res.json([]);
+
+    // Group by title+category and count frequency
+    const freqMap = {};
+    complaints.forEach(c => {
+      const key = `${c.title?.trim()}||${c.category?.trim()}`;
+      if (!freqMap[key]) {
+        freqMap[key] = {
+          title: c.title,
+          description: c.description,
+          category: c.category,
+          building: c.location?.building,
+          floor: c.location?.floor,
+          room: c.location?.room,
+          count: 0
+        };
+      }
+      freqMap[key].count++;
+    });
+
+    // Sort by frequency descending, return top 5
+    const sorted = Object.values(freqMap)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    return res.json(sorted);
+  } catch (err) {
+    return res.status(500).json({ message: 'Error fetching recommendations', error: err.message });
+  }
+};
