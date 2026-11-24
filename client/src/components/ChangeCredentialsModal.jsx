@@ -19,6 +19,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [demoOtp, setDemoOtp] = useState('');
+  const [emailDispatched, setEmailDispatched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -55,6 +56,11 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         })
       });
 
+      if (res && res.emailSent) {
+        setEmailDispatched(true);
+      } else {
+        setEmailDispatched(false);
+      }
       if (res && res.demoOtp) {
         setDemoOtp(res.demoOtp);
       }
@@ -239,20 +245,35 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         {step === 2 && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             
-            {/* Demo Notice Banner */}
-            {demoOtp && (
-              <div className="p-3.5 rounded-2xl bg-fuchsia-500/15 border border-fuchsia-500/30 text-white text-xs space-y-1">
-                <div className="flex items-center gap-2 font-bold text-fuchsia-300">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Demo Mode Verification Code</span>
+            {/* Real Email Dispatched Banner or Demo Fallback */}
+            {emailDispatched ? (
+              <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-white text-xs space-y-1">
+                <div className="flex items-center gap-2 font-bold text-emerald-300">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Email Dispatched!</span>
                 </div>
                 <p className="text-slate-300 text-[11px]">
-                  Your 6-digit OTP code is: <span className="font-mono font-bold text-base text-white tracking-widest px-2 py-0.5 rounded bg-black/40 border border-fuchsia-500/30 ml-1">{demoOtp}</span>
+                  A 6-digit verification code has been sent to: <strong className="text-white font-mono">{targetEmail}</strong>
                 </p>
                 <p className="text-[10px] text-slate-400">
-                  (In live production, this code is dispatched to {targetEmail})
+                  Please check your inbox (and spam/junk folder). Valid for 5 minutes.
                 </p>
               </div>
+            ) : (
+              demoOtp && (
+                <div className="p-3.5 rounded-2xl bg-fuchsia-500/15 border border-fuchsia-500/30 text-white text-xs space-y-1">
+                  <div className="flex items-center gap-2 font-bold text-fuchsia-300">
+                    <Sparkles className="w-4 h-4" />
+                    <span>Demo Mode Verification Code</span>
+                  </div>
+                  <p className="text-slate-300 text-[11px]">
+                    Your 6-digit OTP code is: <span className="font-mono font-bold text-base text-white tracking-widest px-2 py-0.5 rounded bg-black/40 border border-fuchsia-500/30 ml-1">{demoOtp}</span>
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    (SMTP not configured in environment; showing demo code for testing)
+                  </p>
+                </div>
+              )
             )}
 
             <div className="space-y-1.5">

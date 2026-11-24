@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, ActivityLog } from '../models/index.js';
 import { getDb } from '../config/firebase.js';
+import { sendOtpEmail } from '../utils/mailer.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'jims_mca_predictive_maintenance_secret_key_2026';
 
@@ -358,10 +359,19 @@ export const sendOtp = async (req, res) => {
       console.warn('Firestore OTP save warning:', e.message);
     }
 
+    // Dispatch real email via SMTP if configured
+    let emailResult = { sent: false };
+    if (cleanContact.includes('@')) {
+      emailResult = await sendOtpEmail(cleanContact, otp);
+    }
+
     return res.json({
       success: true,
-      message: `Verification code sent to ${contact}`,
-      demoOtp: otp, // For demo showcase
+      message: emailResult.sent
+        ? `Verification code dispatched to ${contact}`
+        : `Verification code generated for ${contact}`,
+      emailSent: emailResult.sent,
+      demoOtp: otp, // Kept so testing works immediately if SMTP is not configured
       expiresAt
     });
   } catch (err) {
