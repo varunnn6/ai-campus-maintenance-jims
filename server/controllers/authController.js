@@ -606,19 +606,27 @@ export const sendOtp = async (req, res) => {
       console.warn('Firestore OTP save warning:', e.message);
     }
 
-    // Dispatch real email via SMTP with resilient timeout
+    // Dispatch real email via Google Apps Script HTTPS (with 10s timeout)
     let emailResult = { sent: false };
     if (cleanContact.includes('@')) {
       try {
         const mailPromise = sendOtpEmail(cleanContact, otp);
         const timeoutPromise = new Promise((resolve) =>
-          setTimeout(() => resolve({ sent: false, timeout: true, error: 'SMTP response timed out after 4s' }), 4000)
+          setTimeout(() => resolve({ sent: false, timeout: true, error: 'Email dispatch timed out after 10s' }), 10000)
         );
         emailResult = await Promise.race([mailPromise, timeoutPromise]);
       } catch (mailErr) {
         console.error('[sendOtp] Mail dispatch error:', mailErr);
         emailResult = { sent: false, error: mailErr.message };
       }
+    }
+
+    if (!emailResult.sent) {
+      return res.status(500).json({
+        success: false,
+        emailSent: false,
+        message: 'Failed to send verification email. Please try again in a moment.'
+      });
     }
 
     // Mask email for privacy (e.g. va*****16@gmail.com)
@@ -629,13 +637,10 @@ export const sendOtp = async (req, res) => {
 
     return res.json({
       success: true,
-      message: emailResult.sent
-        ? `Verification code dispatched to ${masked}`
-        : `Verification code generated for ${masked}`,
-      emailSent: emailResult.sent,
+      message: `Verification code dispatched to ${masked}`,
+      emailSent: true,
       maskedEmail: masked,
       targetEmail: cleanContact,
-      demoOtp: emailResult.sent ? undefined : otp,
       expiresAt
     });
   } catch (err) {

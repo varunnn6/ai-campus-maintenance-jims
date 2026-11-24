@@ -22,7 +22,6 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
-  const [demoOtp, setDemoOtp] = useState('');
   const [emailDispatched, setEmailDispatched] = useState(false);
   const [displayMaskedEmail, setDisplayMaskedEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -83,9 +82,6 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
       }
       if (res && res.maskedEmail) {
         setDisplayMaskedEmail(res.maskedEmail);
-      }
-      if (res && res.demoOtp) {
-        setDemoOtp(res.demoOtp);
       }
       setStep(2);
     } catch (err) {
@@ -149,7 +145,6 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     setNewPassword('');
     setConfirmPassword('');
     setOtp('');
-    setDemoOtp('');
     setErrorMsg('');
     setSuccessMsg('');
     onClose();
@@ -323,8 +318,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         {step === 2 && (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             
-            {/* Real Email Dispatched Banner or Demo Fallback */}
-            {emailDispatched ? (
+            {/* Real Email Dispatched Banner */}
+            {emailDispatched && (
               <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-white text-xs space-y-1">
                 <div className="flex items-center gap-2 font-bold text-emerald-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -337,21 +332,6 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                   Please check your inbox (and spam folder). Valid for 5 minutes.
                 </p>
               </div>
-            ) : (
-              demoOtp && (
-                <div className="p-3.5 rounded-2xl bg-fuchsia-500/15 border border-fuchsia-500/30 text-white text-xs space-y-1">
-                  <div className="flex items-center gap-2 font-bold text-fuchsia-300">
-                    <Sparkles className="w-4 h-4" />
-                    <span>Demo Mode Verification Code</span>
-                  </div>
-                  <p className="text-slate-300 text-[11px]">
-                    Your 6-digit OTP code is: <span className="font-mono font-bold text-base text-white tracking-widest px-2 py-0.5 rounded bg-black/40 border border-fuchsia-500/30 ml-1">{demoOtp}</span>
-                  </p>
-                  <p className="text-[10px] text-slate-400">
-                    (Showing demo code for testing)
-                  </p>
-                </div>
-              )
             )}
 
             <div className="space-y-1.5">
