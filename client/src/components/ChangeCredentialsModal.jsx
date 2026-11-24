@@ -27,10 +27,20 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
   if (!isOpen) return null;
 
+  const isVarun = (currentUser?.name || '').toLowerCase().includes('varun') || 
+    (currentUser?.enrollmentNumber === '01514004425');
+  const hasRegisteredEmail = isVarun || 
+    (currentUser?.email && !currentUser.email.endsWith('@jims.edu') && currentUser.email.includes('@'));
+
   // Step 1: Request OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!hasRegisteredEmail) {
+      setErrorMsg('No registered recovery email found for your account. Please contact your course coordinator or admin.');
+      return;
+    }
 
     if (!newPassword || newPassword.trim().length < 4) {
       setErrorMsg('Please enter a new password (at least 4 characters).');
@@ -216,28 +226,46 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               />
             </div>
 
-            {/* Email OTP Notice */}
-            <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 flex items-start gap-2.5">
-              <Mail className="w-4 h-4 text-fuchsia-400 shrink-0 mt-0.5" />
-              <div className="space-y-0.5">
-                <span className="font-semibold text-white block">Official Recovery Email</span>
-                <span className="text-[11px] text-slate-400">
-                  Verification OTP will be dispatched strictly to your verified email registered with the administration.
-                </span>
+            {/* Registered Email Status or Missing Notice */}
+            {hasRegisteredEmail ? (
+              <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 flex items-start gap-2.5">
+                <Mail className="w-4 h-4 text-fuchsia-400 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <span className="font-semibold text-white block">Official Recovery Email on File</span>
+                  <span className="text-[11px] text-slate-400">
+                    A 6-digit verification code will be dispatched strictly to your verified email registered with the administration.
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs space-y-1.5">
+                <div className="flex items-center gap-2 font-bold text-amber-200">
+                  <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>No Registered Recovery Email Found</span>
+                </div>
+                <p className="text-slate-300 text-[11px] leading-relaxed">
+                  No verified recovery email has been added for your account yet. Please <strong>contact your course coordinator or admin</strong> to link your official email address.
+                </p>
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full py-3 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-xl shadow-white/20 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+              disabled={isLoading || !hasRegisteredEmail}
+              className={`w-full py-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                hasRegisteredEmail
+                  ? 'bg-white text-slate-900 hover:bg-slate-100 cursor-pointer shadow-xl shadow-white/20 active:scale-[0.98]'
+                  : 'bg-white/10 text-slate-500 cursor-not-allowed border border-white/10'
+              }`}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
                   <span>Generating Verification Code...</span>
                 </>
+              ) : !hasRegisteredEmail ? (
+                <span>No Email Found — Contact Coordinator / Admin</span>
               ) : (
                 <>
                   <span>Send Verification Code</span>

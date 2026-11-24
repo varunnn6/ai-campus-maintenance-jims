@@ -361,10 +361,21 @@ export const sendOtp = async (req, res) => {
       targetEmail = contact.trim().toLowerCase();
     }
 
-    // 3. Specifically for Varun Malik or testing: guarantee varunmalik616@gmail.com
+    // 3. Specifically for Varun Malik: use varunmalik616@gmail.com
     const cleanId = (enrollmentNumber || contact || userId || '').toString().toLowerCase();
-    if (cleanId.includes('01514004425') || cleanId.includes('varun') || !targetEmail || targetEmail.endsWith('@jims.edu')) {
+    const isVarun = cleanId.includes('01514004425') || cleanId.includes('varun') || targetEmail.includes('varunmalik616');
+
+    if (isVarun) {
       targetEmail = 'varunmalik616@gmail.com';
+    }
+
+    // 4. If no registered recovery email in backend (or only placeholder @jims.edu), block and show message
+    if (!targetEmail || targetEmail.endsWith('@jims.edu')) {
+      return res.status(404).json({
+        success: false,
+        noEmailFound: true,
+        message: 'No registered recovery email found for your account. Please contact your course coordinator or admin to register your email.'
+      });
     }
 
     const cleanContact = targetEmail.trim().toLowerCase();
