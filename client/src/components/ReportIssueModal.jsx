@@ -292,12 +292,12 @@ export default function ReportIssueModal({
 
   // Recommendation system: fetch past similar issues for chosen location
   useEffect(() => {
-    if (!building) {
+    if (!isOpen || !building) {
       setRecommendations([]);
       setShowRecommendations(false);
       return;
     }
-    setShowRecommendations(false);
+
     const timer = setTimeout(async () => {
       setIsFetchingRecs(true);
       try {
@@ -312,15 +312,16 @@ export default function ReportIssueModal({
           setRecommendations([]);
           setShowRecommendations(false);
         }
-      } catch {
+      } catch (err) {
+        console.warn('Failed to fetch recommendations:', err);
         setRecommendations([]);
         setShowRecommendations(false);
       } finally {
         setIsFetchingRecs(false);
       }
-    }, 400);
+    }, 250);
     return () => clearTimeout(timer);
-  }, [building, floor, selectedRoomCode, isCustomRoom]);
+  }, [isOpen, building, floor, selectedRoomCode, isCustomRoom]);
 
   // Handle Photo / Video Selection
   const handleMediaUpload = (e) => {
@@ -608,65 +609,77 @@ export default function ReportIssueModal({
           </div>
 
           {/* 2. 🔍 Smart Location Recommendation System (YouTube-like recommendations) */}
-          {(showRecommendations || isFetchingRecs) && recommendations.length > 0 && (
-            <div className="rounded-2xl bg-gradient-to-r from-fuchsia-500/[0.09] via-violet-500/[0.06] to-transparent border border-fuchsia-500/30 p-3.5 space-y-2.5 animate-fade-in shadow-xl">
+          {(recommendations.length > 0 || isFetchingRecs) && (
+            <div className="rounded-2xl bg-gradient-to-r from-fuchsia-500/[0.12] via-violet-500/[0.08] to-transparent border border-fuchsia-500/35 p-3.5 space-y-2.5 animate-fade-in shadow-xl">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-4 h-4 text-fuchsia-400 shrink-0" />
+                  <Lightbulb className="w-4 h-4 text-fuchsia-400 shrink-0 animate-bounce" />
                   <div>
                     <span className="text-[11px] font-bold text-fuchsia-300 uppercase tracking-wider block">
                       Recommended for {building} • {floor}
                     </span>
-                    <span className="text-[10px] text-slate-400">
-                      Most reported in this area in past — tap any to auto-fill
+                    <span className="text-[10px] text-slate-300">
+                      Most reported in this area in past — tap any card to auto-fill
                     </span>
                   </div>
                 </div>
                 {isFetchingRecs ? (
-                  <Loader2 className="w-3.5 h-3.5 text-fuchsia-400 animate-spin" />
+                  <div className="flex items-center gap-1.5 text-[10px] text-fuchsia-300 font-mono">
+                    <Loader2 className="w-3.5 h-3.5 text-fuchsia-400 animate-spin" />
+                    <span>Checking location...</span>
+                  </div>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setShowRecommendations(false)}
-                    className="text-slate-400 hover:text-white transition-colors text-[10px] px-2 py-0.5 rounded bg-white/[0.06]"
+                    onClick={() => {
+                      setRecommendations([]);
+                      setShowRecommendations(false);
+                    }}
+                    className="text-slate-400 hover:text-white transition-colors text-[10px] px-2 py-0.5 rounded bg-white/[0.08]"
                   >
                     ✕ dismiss
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                {recommendations.map((rec, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => {
-                      setTitle(rec.title);
-                      setDescription(rec.description);
-                      setCategory(rec.category);
-                      setShowRecommendations(false);
-                    }}
-                    className="text-left p-3 rounded-xl bg-black/40 border border-fuchsia-500/25 hover:border-fuchsia-400 hover:bg-fuchsia-500/15 transition-all group flex flex-col justify-between cursor-pointer shadow-md"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="text-xs font-bold text-white group-hover:text-fuchsia-200 line-clamp-1">
-                        {rec.title}
+              {recommendations.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {recommendations.map((rec, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        setTitle(rec.title);
+                        setDescription(rec.description);
+                        setCategory(rec.category);
+                      }}
+                      className="text-left p-3 rounded-xl bg-black/60 border border-fuchsia-500/30 hover:border-fuchsia-400 hover:bg-fuchsia-500/20 transition-all group flex flex-col justify-between cursor-pointer shadow-md"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-xs font-bold text-white group-hover:text-fuchsia-200 line-clamp-1">
+                            {rec.title}
+                          </span>
+                          <span className="shrink-0 text-[9px] px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-300 font-mono">
+                            {rec.matchScope === 'exact-room' ? 'Room match' : rec.matchScope === 'floor' ? 'Floor match' : 'Building match'}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 line-clamp-1">
+                          {rec.category}
+                        </div>
                       </div>
-                      <div className="text-[10px] text-slate-400 line-clamp-1">
-                        {rec.category}
+                      <div className="flex items-center justify-between pt-2 mt-2 border-t border-white/[0.08] text-[10px]">
+                        <span className="text-fuchsia-400 font-bold">
+                          {rec.count}× reported in past
+                        </span>
+                        <span className="text-slate-300 group-hover:text-white font-medium flex items-center gap-1">
+                          tap to auto-fill →
+                        </span>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-2 mt-1.5 border-t border-white/[0.08] text-[10px]">
-                      <span className="text-fuchsia-400 font-bold">
-                        {rec.count}× reported
-                      </span>
-                      <span className="text-slate-300 group-hover:text-white font-medium">
-                        tap to select →
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

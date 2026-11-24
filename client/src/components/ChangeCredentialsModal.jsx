@@ -379,3 +379,4 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     </div>
   );
 }
+

@@ -358,71 +358,88 @@ export const getRecommendations = async (req, res) => {
       return res.json([]);
     }
 
-    // Helper to query and group complaints
-    const queryAndRank = async (filterQuery, matchScope) => {
-      const complaints = await Complaint.find(filterQuery)
-        .select('title description category location status')
-        .limit(300)
-        .lean();
+    const allComplaints = await Complaint.find();
+    if (!allComplaints || allComplaints.length === 0) {
+      return res.json([]);
+    }
 
-      if (!complaints || complaints.length === 0) return [];
+    const cleanBuilding = building.trim().toLowerCase();
+    const cleanFloor = floor ? floor.trim().toLowerCase() : '';
+    const cleanRoom = room ? room.trim().toLowerCase() : '';
 
+    // Helper to rank complaints by frequency
+    const rankComplaints = (list, matchScope) => {
       const freqMap = {};
-      complaints.forEach(c => {
-        const titleKey = (c.title || '').trim().toLowerCase();
-        const catKey = (c.category || '').trim();
-        const key = `${titleKey}||${catKey}`;
-        
+      list.forEach(c => {
+        const title = (c.title || '').trim();
+        const category = (c.category || '').trim();
+        if (!title) return;
+        const key = `${title.toLowerCase()}||${category.toLowerCase()}`;
         if (!freqMap[key]) {
           freqMap[key] = {
-            title: c.title,
-            description: c.description,
-            category: c.category,
+            title,
+            description: c.description || '',
+            category: c.category || 'General Maintenance',
             building: c.location?.building,
             floor: c.location?.floor,
             room: c.location?.room,
-            matchScope: matchScope, // 'exact-room' | 'floor' | 'building'
+            matchScope,
             count: 0
           };
         }
         freqMap[key].count++;
       });
-
       return Object.values(freqMap)
         .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
+        .slice(0, 6);
     };
 
-    // 1. Try exact room if provided
-    if (room) {
-      const exactRoomFilter = { 'location.building': building };
-      if (floor) exactRoomFilter['location.floor'] = floor;
-      exactRoomFilter['location.room'] = room;
+    // 1. Exact room match in that building & floor
+    if (cleanRoom) {
+      const roomMatches = allComplaints.filter(c => {
+        const b = (c.location?.building || '').toLowerCase();
+        const f = (c.location?.floor || '').toLowerCase();
+        const r = (c.location?.room || '').toLowerCase();
+        const fname = (c.location?.facilityName || '').toLowerCase();
+        const matchB = b.includes(cleanBuilding) || cleanBuilding.includes(b);
+        const matchF = !cleanFloor || f.includes(cleanFloor) || cleanFloor.includes(f);
+        const matchR = r.includes(cleanRoom) || cleanRoom.includes(r) || fname.includes(cleanRoom);
+        return matchB && matchF && matchR;
+      });
 
-      const roomResults = await queryAndRank(exactRoomFilter, 'exact-room');
-      if (roomResults.length > 0) {
-        return res.json(roomResults);
+      if (roomMatches.length > 0) {
+        return res.json(rankComplaints(roomMatches, 'exact-room'));
       }
     }
 
-    // 2. Try floor level if provided
-    if (floor) {
-      const floorFilter = { 
-        'location.building': building,
-        'location.floor': floor
-      };
-      const floorResults = await queryAndRank(floorFilter, 'floor');
-      if (floorResults.length > 0) {
-        return res.json(floorResults);
+    // 2. Floor match in that building
+    if (cleanFloor) {
+      const floorMatches = allComplaints.filter(c => {
+        const b = (c.location?.building || '').toLowerCase();
+        const f = (c.location?.floor || '').toLowerCase();
+        const matchB = b.includes(cleanBuilding) || cleanBuilding.includes(b);
+        const matchF = f.includes(cleanFloor) || cleanFloor.includes(f);
+        return matchB && matchF;
+      });
+
+      if (floorMatches.length > 0) {
+        return res.json(rankComplaints(floorMatches, 'floor'));
       }
     }
 
-    // 3. Try building level
-    const buildingFilter = { 'location.building': building };
-    const buildingResults = await queryAndRank(buildingFilter, 'building');
-    return res.json(buildingResults);
+    // 3. Building match
+    const buildingMatches = allComplaints.filter(c => {
+      const b = (c.location?.building || '').toLowerCase();
+      return b.includes(cleanBuilding) || cleanBuilding.includes(b);
+    });
 
+    if (buildingMatches.length > 0) {
+      return res.json(rankComplaints(buildingMatches, 'building'));
+    }
+
+    return res.json([]);
   } catch (err) {
+    console.error('Error fetching recommendations:', err);
     return res.status(500).json({ message: 'Error fetching recommendations', error: err.message });
   }
 };
