@@ -14,6 +14,7 @@ import {
   Inbox, 
   LogOut,
   UserPlus,
+  Users,
   Key
 } from 'lucide-react';
 
@@ -150,15 +151,27 @@ export default function Navbar({
         {/* Right Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
-          {/* Admin Add Member Button */}
+          {/* Admin Directory & Emails Button */}
           {currentRole === 'admin' && onOpenAddUserModal && (
             <button
               onClick={onOpenAddUserModal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-fuchsia-300 hover:text-white border-fuchsia-500/30 transition-colors cursor-pointer"
-              title="Add New Student, Worker or Faculty"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-xs font-bold text-fuchsia-300 hover:text-white border-fuchsia-500/40 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 transition-all cursor-pointer shadow-lg shadow-fuchsia-500/10"
+              title="Assign Recovery Emails & Search Campus Directory"
             >
-              <UserPlus className="w-3.5 h-3.5 text-fuchsia-400" />
-              <span className="hidden sm:inline">Add Member</span>
+              <Users className="w-3.5 h-3.5 text-fuchsia-400" />
+              <span className="hidden sm:inline">Directory & Emails</span>
+            </button>
+          )}
+
+          {/* Reset Password Button For Every Profile */}
+          {onOpenChangeCredentials && (
+            <button
+              onClick={onOpenChangeCredentials}
+              className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-pill text-xs font-semibold text-slate-300 hover:text-white border-white/10 hover:border-fuchsia-500/30 transition-colors cursor-pointer"
+              title="Reset Password via Email OTP"
+            >
+              <Key className="w-3.5 h-3.5 text-fuchsia-400" />
+              <span>Reset Password</span>
             </button>
           )}
 

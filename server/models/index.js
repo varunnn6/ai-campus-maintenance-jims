@@ -12,7 +12,12 @@ const createFirestoreAdapter = (collectionName) => ({
   async find(query = {}) {
     const db = getDb();
     let ref = db.collection(collectionName);
-    const snapshot = await ref.orderBy('createdAt', 'desc').get();
+    let snapshot;
+    try {
+      snapshot = await ref.orderBy('createdAt', 'desc').get();
+    } catch (e) {
+      snapshot = await ref.get();
+    }
     let docs = snapshot.docs.map(d => ({ _id: d.id, ...d.data() }));
 
     // Apply query filters

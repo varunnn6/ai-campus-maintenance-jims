@@ -9,12 +9,16 @@ import {
   AlertCircle, 
   Loader2, 
   ArrowRight,
-  Sparkles
+  Sparkles,
+  User,
+  GraduationCap,
+  Wrench
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
 export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, onCredentialsUpdated }) {
   const [step, setStep] = useState(1); // 1: password form, 2: OTP verification, 3: success
+  const [identifierInput, setIdentifierInput] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
@@ -27,18 +31,24 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
   if (!isOpen) return null;
 
+  // Determine if active user profile has an email (for logged-in user)
   const isVarun = (currentUser?.name || '').toLowerCase().includes('varun') || 
     (currentUser?.enrollmentNumber === '01514004425');
-  const hasRegisteredEmail = isVarun || 
-    (currentUser?.email && !currentUser.email.endsWith('@jims.edu') && currentUser.email.includes('@'));
+  const hasRegisteredEmail = currentUser 
+    ? (isVarun || Boolean(currentUser?.recoveryEmail && currentUser.recoveryEmail.includes('@')) || Boolean(currentUser?.email && !currentUser.email.endsWith('@jims.edu') && currentUser.email.includes('@')))
+    : true; // For unauthenticated users, backend verifies recovery email dynamically
 
   // Step 1: Request OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!hasRegisteredEmail) {
-      setErrorMsg('No registered recovery email found for your account. Please contact your course coordinator or admin.');
+    const targetIdentifier = currentUser 
+      ? (currentUser?.enrollmentNumber || currentUser?.username || currentUser?.email || currentUser?._id)
+      : identifierInput.trim();
+
+    if (!targetIdentifier) {
+      setErrorMsg('Please enter your Enrollment Number (Students) or Username / Email (Staff/Tech).');
       return;
     }
 
@@ -60,7 +70,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: currentUser?._id || currentUser?.id,
-          enrollmentNumber: currentUser?.enrollmentNumber || null,
+          enrollmentNumber: currentUser?.enrollmentNumber || (targetIdentifier.match(/^\d+$/) ? targetIdentifier : null),
+          identifier: targetIdentifier,
           purpose: 'password_change'
         })
       });
@@ -78,7 +89,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
       }
       setStep(2);
     } catch (err) {
-      setErrorMsg(err.message || 'Failed to dispatch verification OTP. Please try again.');
+      console.error('Request OTP error:', err);
+      setErrorMsg(err.message || 'Failed to dispatch verification OTP. Please verify your account identifier.');
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +106,10 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
       return;
     }
 
+    const targetIdentifier = currentUser 
+      ? (currentUser?.enrollmentNumber || currentUser?.username || currentUser?.email || currentUser?._id)
+      : identifierInput.trim();
+
     setIsLoading(true);
 
     try {
@@ -102,14 +118,14 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: currentUser?._id || currentUser?.id,
-          enrollmentNumber: currentUser?.enrollmentNumber || null,
-          currentIdentifier: currentUser?.enrollmentNumber || currentUser?.email || currentUser?.username,
+          enrollmentNumber: currentUser?.enrollmentNumber || (targetIdentifier.match(/^\d+$/) ? targetIdentifier : null),
+          currentIdentifier: targetIdentifier,
           otp: otp.trim(),
           newPassword: newPassword.trim()
         })
       });
 
-      setSuccessMsg('Your password has been updated successfully!');
+      setSuccessMsg('Your login password has been updated successfully!');
       setStep(3);
 
       if (res.user && onCredentialsUpdated) {
@@ -118,10 +134,10 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
       setTimeout(() => {
         handleResetAndClose();
-      }, 2000);
+      }, 2200);
 
     } catch (err) {
-      setErrorMsg(err.message || 'OTP verification failed. Please verify the code.');
+      setErrorMsg(err.message || 'OTP verification failed. Please verify the code and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -129,6 +145,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
   const handleResetAndClose = () => {
     setStep(1);
+    setIdentifierInput('');
     setNewPassword('');
     setConfirmPassword('');
     setOtp('');
@@ -152,10 +169,10 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                Change Password
+                Reset Login Password
               </h2>
               <p className="text-xs text-slate-400">
-                Securely update your login password via email OTP
+                Securely update password via verified email OTP
               </p>
             </div>
           </div>
@@ -167,19 +184,26 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
           </button>
         </div>
 
-        {/* User Badge */}
-        <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-between">
-          <div>
-            <div className="text-xs font-bold text-white">{currentUser?.name || 'Logged-in Member'}</div>
-            <div className="text-[10px] text-fuchsia-400 font-mono capitalize">
-              {currentUser?.role || 'User'} • {currentUser?.enrollmentNumber || currentUser?.email || 'Active'}
+        {/* User Identity Banner (If logged in) or Account Prompt */}
+        {currentUser ? (
+          <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-bold text-white">{currentUser?.name || 'Logged-in Member'}</div>
+              <div className="text-[10px] text-fuchsia-400 font-mono capitalize">
+                {currentUser?.role || 'User'} • {currentUser?.enrollmentNumber || currentUser?.email || 'Active'}
+              </div>
             </div>
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" />
+              Verified Profile
+            </span>
           </div>
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3" />
-            Verified
-          </span>
-        </div>
+        ) : (
+          <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-300 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-fuchsia-400 shrink-0" />
+            <span>Available for all profiles (Students, Faculty, Technicians & Admins)</span>
+          </div>
+        )}
 
         {/* Error Alert */}
         {errorMsg && (
@@ -189,10 +213,29 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
           </div>
         )}
 
-        {/* STEP 1: Enter New Password */}
+        {/* STEP 1: Enter Identifier & New Password */}
         {step === 1 && (
           <form onSubmit={handleRequestOtp} className="space-y-4">
             
+            {/* If NOT logged in: Prompt for Enrollment / Username */}
+            {!currentUser && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Enrollment Number / Username / Email *</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={identifierInput}
+                  onChange={(e) => setIdentifierInput(e.target.value)}
+                  placeholder="e.g. 01514004425 or faculty@jims.edu"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  autoFocus
+                />
+              </div>
+            )}
+
             {/* New Password */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
@@ -204,9 +247,9 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
+                placeholder="Enter new password (min. 4 characters)"
                 className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-                autoFocus
+                autoFocus={Boolean(currentUser)}
               />
             </div>
 
@@ -233,7 +276,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                 <div className="space-y-0.5">
                   <span className="font-semibold text-white block">Official Recovery Email on File</span>
                   <span className="text-[11px] text-slate-400">
-                    A 6-digit verification code will be dispatched strictly to your verified email registered with the administration.
+                    A 6-digit verification code will be dispatched strictly to your verified recovery Gmail registered in the backend.
                   </span>
                 </div>
               </div>
@@ -252,9 +295,9 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading || !hasRegisteredEmail}
+              disabled={isLoading || (currentUser && !hasRegisteredEmail)}
               className={`w-full py-3 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                hasRegisteredEmail
+                !currentUser || hasRegisteredEmail
                   ? 'bg-white text-slate-900 hover:bg-slate-100 cursor-pointer shadow-xl shadow-white/20 active:scale-[0.98]'
                   : 'bg-white/10 text-slate-500 cursor-not-allowed border border-white/10'
               }`}
@@ -262,9 +305,9 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
-                  <span>Generating Verification Code...</span>
+                  <span>Sending Verification Code...</span>
                 </>
-              ) : !hasRegisteredEmail ? (
+              ) : (currentUser && !hasRegisteredEmail) ? (
                 <span>No Email Found — Contact Coordinator / Admin</span>
               ) : (
                 <>
@@ -288,7 +331,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                   <span>Verification Email Dispatched!</span>
                 </div>
                 <p className="text-slate-300 text-[11px]">
-                  A 6-digit verification code has been dispatched to: <strong className="text-white font-mono">{displayMaskedEmail || 'varunmalik616@gmail.com'}</strong>
+                  A 6-digit verification code has been dispatched to: <strong className="text-white font-mono">{displayMaskedEmail || 'your verified email'}</strong>
                 </p>
                 <p className="text-[10px] text-slate-400">
                   Please check your inbox (and spam folder). Valid for 5 minutes.
@@ -305,7 +348,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                     Your 6-digit OTP code is: <span className="font-mono font-bold text-base text-white tracking-widest px-2 py-0.5 rounded bg-black/40 border border-fuchsia-500/30 ml-1">{demoOtp}</span>
                   </p>
                   <p className="text-[10px] text-slate-400">
-                    (SMTP not configured in environment; showing demo code for testing)
+                    (Showing demo code for testing)
                   </p>
                 </div>
               )
@@ -357,7 +400,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Confirm & Change Password</span>
+                  <span>Confirm & Update Password</span>
                 </>
               )}
             </button>
@@ -370,7 +413,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-white">Password Changed!</h3>
+            <h3 className="text-base font-bold text-white">Password Updated!</h3>
             <p className="text-xs text-slate-300 max-w-sm mx-auto">
               {successMsg || 'Your login password has been updated successfully.'}
             </p>

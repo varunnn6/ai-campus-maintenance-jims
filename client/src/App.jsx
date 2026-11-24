@@ -240,9 +240,24 @@ export default function App() {
     showToast(`Replacement order form prepared for ${cluster.building} ${cluster.room}`);
   };
 
-  // If user is not authenticated, render Login Page
+  // If user is not authenticated, render Login Page and Password Reset Modal
   if (!currentUser) {
-    return <LoginView onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <>
+        <LoginView 
+          onLoginSuccess={handleLoginSuccess} 
+          onOpenResetPassword={() => setIsChangeCredentialsOpen(true)}
+        />
+        <ChangeCredentialsModal
+          isOpen={isChangeCredentialsOpen}
+          onClose={() => setIsChangeCredentialsOpen(false)}
+          currentUser={null}
+          onCredentialsUpdated={() => {
+            showToast('Password reset successfully! Please sign in with your new password.');
+          }}
+        />
+      </>
+    );
   }
 
   return (

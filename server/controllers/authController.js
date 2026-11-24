@@ -326,45 +326,250 @@ export const getTechnicians = async (req, res) => {
   }
 };
 
+// Admin endpoint to get users by role and search query for Directory & Gmail assignments
+export const getUsers = async (req, res) => {
+  try {
+    const { role, search } = req.query;
+    const db = getDb();
+    let allUsers = [];
+
+    if (db) {
+      try {
+        const snap = await db.collection('users').get();
+        allUsers = snap.docs.map(d => ({ _id: d.id, ...d.data() }));
+      } catch (e) {
+        allUsers = await User.find({});
+      }
+    } else {
+      allUsers = await User.find({});
+    }
+
+    // Role filtering
+    let filtered = allUsers;
+    if (role && role !== 'all') {
+      const targetRole = role.toLowerCase().trim();
+      filtered = filtered.filter(u => {
+        const uRole = (u.role || '').toLowerCase();
+        if (targetRole === 'faculty' || targetRole === 'staff') {
+          return uRole === 'staff' || uRole === 'faculty';
+        }
+        return uRole === targetRole;
+      });
+    }
+
+    // Search query filtering (by name, enrollmentNumber, email, recoveryEmail, or username)
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      filtered = filtered.filter(u => {
+        const name = (u.name || '').toLowerCase();
+        const enroll = (u.enrollmentNumber || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const recEmail = (u.recoveryEmail || '').toLowerCase();
+        const username = (u.username || '').toLowerCase();
+        return name.includes(q) || enroll.includes(q) || email.includes(q) || recEmail.includes(q) || username.includes(q);
+      });
+    }
+
+    // Sanitize and decorate with recovery email status
+    const sanitized = filtered.map(u => {
+      const recoveryEmail = u.recoveryEmail || (u.email && !u.email.endsWith('@jims.edu') ? u.email : '');
+      const isVarun = (u.name || '').toLowerCase().includes('varun') || (u.enrollmentNumber === '01514004425');
+      const finalRecoveryEmail = isVarun ? (recoveryEmail || 'varunmalik616@gmail.com') : recoveryEmail;
+      const hasRecoveryEmail = Boolean(finalRecoveryEmail && finalRecoveryEmail.includes('@') && !finalRecoveryEmail.endsWith('@jims.edu'));
+
+      return {
+        _id: u._id,
+        name: u.name,
+        role: u.role || 'student',
+        department: u.department || '',
+        trade: u.trade || null,
+        enrollmentNumber: u.enrollmentNumber || null,
+        fatherName: u.fatherName || null,
+        username: u.username || null,
+        phone: u.phone || '',
+        loginEmail: u.email || '',
+        recoveryEmail: finalRecoveryEmail,
+        hasRecoveryEmail,
+        createdAt: u.createdAt || null
+      };
+    });
+
+    return res.json({
+      success: true,
+      count: sanitized.length,
+      users: sanitized
+    });
+  } catch (err) {
+    console.error('getUsers error:', err);
+    return res.status(500).json({ message: 'Error retrieving user list', error: err.message });
+  }
+};
+
+// Admin endpoint to update a single user's recovery Gmail
+export const updateUserEmail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, recoveryEmail } = req.body;
+    const newEmail = (recoveryEmail || email || '').trim().toLowerCase();
+
+    if (!newEmail || !newEmail.includes('@') || !newEmail.includes('.')) {
+      return res.status(400).json({ message: 'Please provide a valid Gmail/email address.' });
+    }
+
+    const db = getDb();
+    let docRef = null;
+
+    if (db) {
+      const directDoc = await db.collection('users').doc(id).get();
+      if (directDoc.exists) {
+        docRef = db.collection('users').doc(id);
+      } else {
+        // Query by enrollmentNumber or _id
+        const snap = await db.collection('users').where('enrollmentNumber', '==', id).limit(1).get();
+        if (!snap.empty) {
+          docRef = snap.docs[0].ref;
+        }
+      }
+    }
+
+    if (!docRef && db) {
+      docRef = db.collection('users').doc(id);
+    }
+
+    const updateData = {
+      recoveryEmail: newEmail,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (docRef) {
+      await docRef.set(updateData, { merge: true });
+    }
+
+    await ActivityLog.create({
+      action: 'RECOVERY_EMAIL_UPDATED_BY_ADMIN',
+      userId: req.user?._id || 'admin',
+      userName: req.user?.name || 'Administrator',
+      details: { targetUserId: id, updatedEmail: newEmail }
+    });
+
+    return res.json({
+      success: true,
+      message: `Recovery email updated successfully to ${newEmail}`,
+      userId: id,
+      recoveryEmail: newEmail
+    });
+  } catch (err) {
+    console.error('updateUserEmail error:', err);
+    return res.status(500).json({ message: 'Error updating recovery email', error: err.message });
+  }
+};
+
+// Admin endpoint to batch update recovery Gmails for multiple users at once
+export const batchUpdateUserEmails = async (req, res) => {
+  try {
+    const { updates } = req.body;
+    if (!Array.isArray(updates) || updates.length === 0) {
+      return res.status(400).json({ message: 'Updates array is required' });
+    }
+
+    const db = getDb();
+    let updatedCount = 0;
+
+    for (const item of updates) {
+      const id = item.id || item._id;
+      const targetEmail = (item.recoveryEmail || item.email || '').trim().toLowerCase();
+      
+      if (!id || !targetEmail || !targetEmail.includes('@')) continue;
+
+      if (db) {
+        let docRef = db.collection('users').doc(id);
+        const check = await docRef.get();
+        if (!check.exists && item.enrollmentNumber) {
+          const snap = await db.collection('users').where('enrollmentNumber', '==', item.enrollmentNumber.trim()).limit(1).get();
+          if (!snap.empty) {
+            docRef = snap.docs[0].ref;
+          }
+        }
+        await docRef.set({
+          recoveryEmail: targetEmail,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        updatedCount++;
+      }
+    }
+
+    await ActivityLog.create({
+      action: 'BATCH_RECOVERY_EMAILS_UPDATED',
+      userId: req.user?._id || 'admin',
+      userName: req.user?.name || 'Administrator',
+      details: { updatedCount }
+    });
+
+    return res.json({
+      success: true,
+      updatedCount,
+      message: `Successfully updated ${updatedCount} user recovery email(s).`
+    });
+  } catch (err) {
+    console.error('batchUpdateUserEmails error:', err);
+    return res.status(500).json({ message: 'Error processing batch recovery emails', error: err.message });
+  }
+};
+
 // In-memory fallback OTP storage
 const otpStore = new Map();
 
 // Send OTP to registered email for verification
 export const sendOtp = async (req, res) => {
   try {
-    const { contact, userId, enrollmentNumber, purpose = 'password_change' } = req.body;
+    const { contact, userId, enrollmentNumber, identifier, purpose = 'password_change' } = req.body;
     
     let targetEmail = '';
     const db = getDb();
+    const cleanId = (identifier || enrollmentNumber || userId || contact || '').toString().trim();
 
-    // 1. Resolve registered user email from database
-    if (db && (userId || enrollmentNumber)) {
-      const docId = userId || (enrollmentNumber ? `student_${enrollmentNumber.trim()}` : null);
-      if (docId) {
-        const userDoc = await db.collection('users').doc(docId).get();
-        if (userDoc.exists) {
-          const udata = userDoc.data();
-          targetEmail = udata.recoveryEmail || udata.email || '';
-        }
+    // 1. Resolve registered user email from database for any profile (Student, Faculty, Tech, Admin)
+    if (db && cleanId) {
+      const possibleIds = [cleanId, `student_${cleanId}`, `user_${cleanId}`];
+      for (const pid of possibleIds) {
+        if (targetEmail) break;
+        try {
+          const userDoc = await db.collection('users').doc(pid).get();
+          if (userDoc.exists) {
+            const udata = userDoc.data();
+            targetEmail = udata.recoveryEmail || (udata.email && !udata.email.endsWith('@jims.edu') ? udata.email : '');
+          }
+        } catch (e) {}
       }
-      if (!targetEmail && enrollmentNumber) {
-        const snap = await db.collection('users').where('enrollmentNumber', '==', enrollmentNumber.trim()).limit(1).get();
-        if (!snap.empty) {
-          const udata = snap.docs[0].data();
-          targetEmail = udata.recoveryEmail || udata.email || '';
-        }
+
+      // Query lookup across enrollmentNumber, username, email, or name
+      if (!targetEmail) {
+        const cleanLower = cleanId.toLowerCase();
+        try {
+          const snap = await db.collection('users').get();
+          snap.forEach(d => {
+            if (targetEmail) return;
+            const udata = d.data();
+            const uEnroll = (udata.enrollmentNumber || '').toLowerCase();
+            const uUser = (udata.username || '').toLowerCase();
+            const uEmail = (udata.email || '').toLowerCase();
+            const uName = (udata.name || '').toLowerCase();
+
+            if (uEnroll === cleanLower || uUser === cleanLower || uEmail === cleanLower || uName === cleanLower || d.id.toLowerCase() === cleanLower) {
+              targetEmail = udata.recoveryEmail || (udata.email && !udata.email.endsWith('@jims.edu') ? udata.email : '');
+            }
+          });
+        } catch (e) {}
       }
     }
 
-    // 2. Fallback to passed contact if provided
-    if (!targetEmail && contact && contact.includes('@')) {
+    // 2. Fallback to passed contact if provided and not a placeholder
+    if (!targetEmail && contact && contact.includes('@') && !contact.endsWith('@jims.edu')) {
       targetEmail = contact.trim().toLowerCase();
     }
 
     // 3. Specifically for Varun Malik: use varunmalik616@gmail.com
-    const cleanId = (enrollmentNumber || contact || userId || '').toString().toLowerCase();
-    const isVarun = cleanId.includes('01514004425') || cleanId.includes('varun') || targetEmail.includes('varunmalik616');
-
+    const isVarun = cleanId.toLowerCase().includes('01514004425') || cleanId.toLowerCase().includes('varun') || targetEmail.includes('varunmalik616');
     if (isVarun) {
       targetEmail = 'varunmalik616@gmail.com';
     }

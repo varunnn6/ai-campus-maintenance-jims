@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
-export default function LoginView({ onLoginSuccess }) {
+export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
   const [authMode, setAuthMode] = useState('student'); // 'student' or 'staff-ops'
   
   // Student form state
@@ -325,6 +325,18 @@ export default function LoginView({ onLoginSuccess }) {
                 )}
               </button>
 
+              {onOpenResetPassword && (
+                <div className="pt-1 text-center">
+                  <button
+                    type="button"
+                    onClick={onOpenResetPassword}
+                    className="inline-flex items-center gap-1.5 text-xs text-fuchsia-300 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <span>Forgot or Reset Password via Email OTP?</span>
+                  </button>
+                </div>
+              )}
+
             </form>
 
           </div>
@@ -400,6 +412,18 @@ export default function LoginView({ onLoginSuccess }) {
                     </>
                   )}
                 </button>
+
+                {onOpenResetPassword && (
+                  <div className="pt-1 text-center">
+                    <button
+                      type="button"
+                      onClick={onOpenResetPassword}
+                      className="inline-flex items-center gap-1.5 text-xs text-fuchsia-300 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <span>Forgot or Reset Staff / Tech Password?</span>
+                    </button>
+                  </div>
+                )}
 
               </form>
             </div>

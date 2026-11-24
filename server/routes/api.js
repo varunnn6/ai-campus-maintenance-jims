@@ -9,10 +9,13 @@ import { authenticateToken, softAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// --- Auth Routes ---
+// --- Auth & User Directory Routes ---
 router.post('/auth/register', authCtrl.register);
 router.post('/auth/login', authCtrl.login);
+router.get('/auth/users', authCtrl.getUsers);
 router.post('/auth/users', authCtrl.createUser);
+router.patch('/auth/users/:id/email', authCtrl.updateUserEmail);
+router.post('/auth/users/batch-emails', authCtrl.batchUpdateUserEmails);
 router.post('/auth/send-otp', authCtrl.sendOtp);
 router.post('/auth/update-credentials', authCtrl.updateCredentials);
 router.get('/auth/me', authenticateToken, authCtrl.getCurrentUser);
