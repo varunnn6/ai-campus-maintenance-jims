@@ -20,14 +20,12 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
   const [otp, setOtp] = useState('');
   const [demoOtp, setDemoOtp] = useState('');
   const [emailDispatched, setEmailDispatched] = useState(false);
+  const [displayMaskedEmail, setDisplayMaskedEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   if (!isOpen) return null;
-
-  const targetEmail = currentUser?.email || 
-    (currentUser?.enrollmentNumber ? `${currentUser.enrollmentNumber.toLowerCase()}@jims.edu` : 'user@jims.edu');
 
   // Step 1: Request OTP
   const handleRequestOtp = async (e) => {
@@ -51,7 +49,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact: targetEmail,
+          userId: currentUser?._id || currentUser?.id,
+          enrollmentNumber: currentUser?.enrollmentNumber || null,
           purpose: 'password_change'
         })
       });
@@ -60,6 +59,9 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         setEmailDispatched(true);
       } else {
         setEmailDispatched(false);
+      }
+      if (res && res.maskedEmail) {
+        setDisplayMaskedEmail(res.maskedEmail);
       }
       if (res && res.demoOtp) {
         setDemoOtp(res.demoOtp);
@@ -90,8 +92,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: currentUser?._id || currentUser?.id,
+          enrollmentNumber: currentUser?.enrollmentNumber || null,
           currentIdentifier: currentUser?.enrollmentNumber || currentUser?.email || currentUser?.username,
-          contact: targetEmail,
           otp: otp.trim(),
           newPassword: newPassword.trim()
         })
@@ -215,9 +217,14 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             </div>
 
             {/* Email OTP Notice */}
-            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
-              <Mail className="w-4 h-4 text-fuchsia-400 shrink-0" />
-              <span>A 6-digit verification code will be sent to: <strong className="text-white font-mono">{targetEmail}</strong></span>
+            <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 text-xs text-slate-300 flex items-start gap-2.5">
+              <Mail className="w-4 h-4 text-fuchsia-400 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="font-semibold text-white block">Official Recovery Email</span>
+                <span className="text-[11px] text-slate-400">
+                  Verification OTP will be dispatched strictly to your verified email registered with the administration.
+                </span>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -250,13 +257,13 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-white text-xs space-y-1">
                 <div className="flex items-center gap-2 font-bold text-emerald-300">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Email Dispatched!</span>
+                  <span>Verification Email Dispatched!</span>
                 </div>
                 <p className="text-slate-300 text-[11px]">
-                  A 6-digit verification code has been sent to: <strong className="text-white font-mono">{targetEmail}</strong>
+                  A 6-digit verification code has been dispatched to: <strong className="text-white font-mono">{displayMaskedEmail || 'varunmalik616@gmail.com'}</strong>
                 </p>
                 <p className="text-[10px] text-slate-400">
-                  Please check your inbox (and spam/junk folder). Valid for 5 minutes.
+                  Please check your inbox (and spam folder). Valid for 5 minutes.
                 </p>
               </div>
             ) : (

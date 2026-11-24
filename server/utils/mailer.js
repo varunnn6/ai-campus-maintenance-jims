@@ -50,3 +50,4 @@ export const sendOtpEmail = async (toEmail, otp) => {
     return { sent: false, error: err.message };
   }
 };
+
