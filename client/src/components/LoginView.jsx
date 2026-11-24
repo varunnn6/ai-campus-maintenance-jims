@@ -79,7 +79,7 @@ export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           identifier: identifier,
-          password: password.toUpperCase()
+          password: password
         })
       });
 

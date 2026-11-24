@@ -138,7 +138,7 @@ export const login = async (req, res) => {
     // For students: father's name in ALL CAPS (e.g. SANDEEP MOHTA)
     let isPasswordValid = false;
     
-    if (user.fatherName) {
+    if (user.fatherName && !user.passwordChanged) {
       const cleanFather = user.fatherName.trim().toUpperCase();
       const cleanEntered = rawPass.toUpperCase();
       if (cleanEntered === cleanFather) {
@@ -733,6 +733,7 @@ export const updateCredentials = async (req, res) => {
     if (newPassword && newPassword.trim()) {
       const salt = await bcrypt.genSalt(10);
       updates.password = await bcrypt.hash(newPassword.trim(), salt);
+      updates.passwordChanged = true;
     }
 
     if (db && userDocId) {
