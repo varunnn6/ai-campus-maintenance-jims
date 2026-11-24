@@ -235,7 +235,7 @@ export default function Navbar({
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left text-xs text-fuchsia-300 hover:bg-fuchsia-500/10 transition-colors cursor-pointer"
                       >
                         <Key className="w-3.5 h-3.5 text-fuchsia-400" />
-                        <span>Change Credentials (OTP)</span>
+                        <span>Change Password (OTP)</span>
                       </button>
                     </div>
                   )}

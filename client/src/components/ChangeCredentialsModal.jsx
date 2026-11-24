@@ -3,7 +3,6 @@ import {
   X, 
   Key, 
   Mail, 
-  Phone, 
   Lock, 
   ShieldCheck, 
   CheckCircle2, 
@@ -15,11 +14,9 @@ import {
 import { apiRequest } from '../api.js';
 
 export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, onCredentialsUpdated }) {
-  const [step, setStep] = useState(1); // 1: form, 2: OTP verification, 3: success
-  const [newEmail, setNewEmail] = useState('');
-  const [newPhone, setNewPhone] = useState('');
+  const [step, setStep] = useState(1); // 1: password form, 2: OTP verification, 3: success
   const [newPassword, setNewPassword] = useState('');
-  const [otpTarget, setOtpTarget] = useState('email'); // 'email' or 'phone'
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [demoOtp, setDemoOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,26 +25,21 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
   if (!isOpen) return null;
 
-  const currentEmail = currentUser?.email || '';
-  const currentPhone = currentUser?.phone || '';
+  const targetEmail = currentUser?.email || 
+    (currentUser?.enrollmentNumber ? `${currentUser.enrollmentNumber.toLowerCase()}@jims.edu` : 'user@jims.edu');
 
   // Step 1: Request OTP
   const handleRequestOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (!newEmail && !newPhone && !newPassword) {
-      setErrorMsg('Please enter at least one credential to update (new email, phone, or password).');
+    if (!newPassword || newPassword.trim().length < 4) {
+      setErrorMsg('Please enter a new password (at least 4 characters).');
       return;
     }
 
-    // Determine destination contact for OTP
-    const destinationContact = otpTarget === 'email' 
-      ? (newEmail.trim() || currentEmail) 
-      : (newPhone.trim() || currentPhone);
-
-    if (!destinationContact) {
-      setErrorMsg(`No destination ${otpTarget} found to dispatch OTP. Please enter your new ${otpTarget}.`);
+    if (newPassword !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify.');
       return;
     }
 
@@ -58,8 +50,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact: destinationContact,
-          purpose: 'credential_update'
+          contact: targetEmail,
+          purpose: 'password_change'
         })
       });
 
@@ -74,7 +66,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     }
   };
 
-  // Step 2: Verify OTP and save
+  // Step 2: Verify OTP and update password
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -87,25 +79,19 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     setIsLoading(true);
 
     try {
-      const destinationContact = otpTarget === 'email' 
-        ? (newEmail.trim() || currentEmail) 
-        : (newPhone.trim() || currentPhone);
-
       const res = await apiRequest('/auth/update-credentials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: currentUser?._id || currentUser?.id,
           currentIdentifier: currentUser?.enrollmentNumber || currentUser?.email || currentUser?.username,
-          contact: destinationContact,
+          contact: targetEmail,
           otp: otp.trim(),
-          newEmail: newEmail.trim() || undefined,
-          newPhone: newPhone.trim() || undefined,
-          newPassword: newPassword.trim() || undefined
+          newPassword: newPassword.trim()
         })
       });
 
-      setSuccessMsg(res.message || 'Your login credentials have been updated successfully!');
+      setSuccessMsg('Your password has been updated successfully!');
       setStep(3);
 
       if (res.user && onCredentialsUpdated) {
@@ -117,7 +103,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
       }, 2000);
 
     } catch (err) {
-      setErrorMsg(err.message || 'OTP verification failed. Please check the code.');
+      setErrorMsg(err.message || 'OTP verification failed. Please verify the code.');
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +111,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
 
   const handleResetAndClose = () => {
     setStep(1);
-    setNewEmail('');
-    setNewPhone('');
     setNewPassword('');
+    setConfirmPassword('');
     setOtp('');
     setDemoOtp('');
     setErrorMsg('');
@@ -139,7 +124,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in">
       <div className="fixed inset-0" onClick={handleResetAndClose} />
 
-      <div className="relative z-10 w-full max-w-lg rounded-[32px] glass-card border border-white/20 p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="relative z-10 w-full max-w-md rounded-[32px] glass-card border border-white/20 p-6 sm:p-8 shadow-2xl space-y-6">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -149,10 +134,10 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                Update Login Credentials
+                Change Password
               </h2>
               <p className="text-xs text-slate-400">
-                Securely update your email, phone, or password with OTP verification
+                Securely update your login password via email OTP
               </p>
             </div>
           </div>
@@ -186,86 +171,47 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
           </div>
         )}
 
-        {/* STEP 1: Enter New Credentials */}
+        {/* STEP 1: Enter New Password */}
         {step === 1 && (
           <form onSubmit={handleRequestOtp} className="space-y-4">
             
-            {/* New Email */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-slate-400" />
-                <span>New Official Email (optional)</span>
-              </label>
-              <input
-                type="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                placeholder={currentEmail || "e.g. yourname@jims.edu"}
-                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-              />
-            </div>
-
-            {/* New Phone */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-slate-400" />
-                <span>New Mobile Number (optional)</span>
-              </label>
-              <input
-                type="tel"
-                value={newPhone}
-                onChange={(e) => setNewPhone(e.target.value)}
-                placeholder={currentPhone || "+91 98100 12345"}
-                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-              />
-            </div>
-
             {/* New Password */}
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span>New Password (optional)</span>
+                <span>New Password *</span>
               </label>
               <input
                 type="password"
+                required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password to update"
+                placeholder="Enter new password"
+                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                autoFocus
+              />
+            </div>
+
+            {/* Confirm Password */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-slate-400" />
+                <span>Confirm New Password *</span>
+              </label>
+              <input
+                type="password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Re-enter new password"
                 className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
               />
             </div>
 
-            {/* OTP Destination Preference */}
-            <div className="space-y-1.5 pt-1">
-              <label className="text-xs font-medium text-slate-300 block">
-                Send Verification OTP code via:
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setOtpTarget('email')}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
-                    otpTarget === 'email'
-                      ? 'bg-fuchsia-500/20 border-fuchsia-500 text-white'
-                      : 'bg-white/[0.04] border-white/10 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>Email OTP</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOtpTarget('phone')}
-                  className={`py-2 px-3 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
-                    otpTarget === 'phone'
-                      ? 'bg-fuchsia-500/20 border-fuchsia-500 text-white'
-                      : 'bg-white/[0.04] border-white/10 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Phone className="w-3.5 h-3.5" />
-                  <span>Phone SMS OTP</span>
-                </button>
-              </div>
+            {/* Email OTP Notice */}
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
+              <Mail className="w-4 h-4 text-fuchsia-400 shrink-0" />
+              <span>A 6-digit verification code will be sent to: <strong className="text-white font-mono">{targetEmail}</strong></span>
             </div>
 
             {/* Submit Button */}
@@ -277,7 +223,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               {isLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
-                  <span>Generating Verification OTP...</span>
+                  <span>Generating Verification Code...</span>
                 </>
               ) : (
                 <>
@@ -304,7 +250,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                   Your 6-digit OTP code is: <span className="font-mono font-bold text-base text-white tracking-widest px-2 py-0.5 rounded bg-black/40 border border-fuchsia-500/30 ml-1">{demoOtp}</span>
                 </p>
                 <p className="text-[10px] text-slate-400">
-                  (In live production, this code is dispatched directly to your {otpTarget})
+                  (In live production, this code is dispatched to {targetEmail})
                 </p>
               </div>
             )}
@@ -331,7 +277,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                 onClick={() => setStep(1)}
                 className="hover:text-white transition-colors cursor-pointer"
               >
-                ← Back to credentials
+                ← Back
               </button>
               <button
                 type="button"
@@ -355,7 +301,7 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
               ) : (
                 <>
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Confirm & Save Credentials</span>
+                  <span>Confirm & Change Password</span>
                 </>
               )}
             </button>
@@ -368,9 +314,9 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
             <div className="w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-bold text-white">Credentials Updated!</h3>
+            <h3 className="text-base font-bold text-white">Password Changed!</h3>
             <p className="text-xs text-slate-300 max-w-sm mx-auto">
-              {successMsg || 'Your login credentials have been permanently updated.'}
+              {successMsg || 'Your login password has been updated successfully.'}
             </p>
           </div>
         )}
@@ -379,4 +325,3 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
     </div>
   );
 }
-
