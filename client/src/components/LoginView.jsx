@@ -9,8 +9,7 @@ import {
   ArrowRight, 
   Loader2, 
   AlertCircle,
-  CheckCircle2,
-  HelpCircle
+  CheckCircle2
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
@@ -27,7 +26,6 @@ export default function LoginView({ onLoginSuccess }) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [infoNotice, setInfoNotice] = useState('');
 
   // Generic 1-Click Role Access for Staff & Technicians (No personal names)
   const GENERIC_STAFF_ROLES = [
@@ -64,7 +62,6 @@ export default function LoginView({ onLoginSuccess }) {
   const handleStudentLogin = async (e) => {
     e.preventDefault();
     setError('');
-    setInfoNotice('');
 
     const identifier = studentIdentifier.trim();
     const password = studentPassword.trim();
@@ -102,7 +99,6 @@ export default function LoginView({ onLoginSuccess }) {
   // Handle generic staff / technician / admin quick login
   const handleGenericStaffLogin = async (profile) => {
     setError('');
-    setInfoNotice('');
     setIsLoading(true);
 
     try {
@@ -268,7 +264,7 @@ export default function LoginView({ onLoginSuccess }) {
               </p>
             </div>
 
-            <form onSubmit={handleStudentLogin} className="space-y-4">
+            <form onSubmit={handleStudentLogin} autoComplete="off" className="space-y-4">
               
               {/* Enrollment No / Username */}
               <div className="space-y-1.5">
@@ -279,6 +275,7 @@ export default function LoginView({ onLoginSuccess }) {
                   <input
                     type="text"
                     required
+                    autoComplete="off"
                     value={studentIdentifier}
                     onChange={(e) => setStudentIdentifier(e.target.value)}
                     placeholder="e.g. 00114004425"
@@ -297,6 +294,7 @@ export default function LoginView({ onLoginSuccess }) {
                   <input
                     type="password"
                     required
+                    autoComplete="new-password"
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value.toUpperCase())}
                     placeholder="e.g. VIKRAM CHOPRA"
