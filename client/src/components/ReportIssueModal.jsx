@@ -14,7 +14,8 @@ import {
   Video,
   PlusCircle,
   MapPin,
-  Lightbulb
+  Lightbulb,
+  ChevronDown
 } from 'lucide-react';
 
 // Pre-configured Campus Hierarchy matching JIMS Rohini infrastructure
@@ -106,6 +107,80 @@ const CATEGORIES = [
   'Fire & Safety Equipment'
 ];
 
+// Presets for "Choose from Common Problems"
+const COMMON_CAMPUS_PROBLEMS = [
+  {
+    title: 'AC / Air Conditioner Not Cooling or Tripping',
+    description: 'The air conditioning unit is blowing ambient air, not cooling the room, or tripping the circuit breaker.',
+    category: 'HVAC & Climate Control'
+  },
+  {
+    title: 'Water Leakage / Tap Running Continuously',
+    description: 'Water is continuously leaking from the plumbing line, wash basin tap, or ceiling pipe causing water pooling.',
+    category: 'Plumbing & Water Supply'
+  },
+  {
+    title: 'Washroom Toilet Flush Clogged / Not Functioning',
+    description: 'Toilet flush valve or cistern is not flushing properly, causing blockage and hygiene issues.',
+    category: 'Plumbing & Water Supply'
+  },
+  {
+    title: 'Classroom Projector Not Displaying / No Signal',
+    description: 'Ceiling projector lamp is off or shows HDMI No Signal when connected to faculty laptop.',
+    category: 'IT & Computer Labs'
+  },
+  {
+    title: 'Ceiling Fan Not Working or Making Noise',
+    description: 'Ceiling fan regulator is not controlling speed or fan motor is vibrating loudly creating noise disturbance.',
+    category: 'Electrical & Power'
+  },
+  {
+    title: 'Campus WiFi / Internet Disconnected in this Room',
+    description: 'Campus WiFi access point has no internet access or drops connection frequently.',
+    category: 'IT & Computer Labs'
+  },
+  {
+    title: 'Broken Student Desk / Chair Damaged',
+    description: 'Student bench desk wood is cracked or chair frame is broken and unsafe to sit on.',
+    category: 'Civil & Furniture'
+  },
+  {
+    title: 'Tube Light / LED Panel Blinking or Fused',
+    description: 'Overhead light fixture is flickering continuously or completely burnt out.',
+    category: 'Electrical & Power'
+  },
+  {
+    title: 'Door Handle / Lock Jammed or Broken',
+    description: 'Room main door lock latch is jammed, cannot be locked, or door handle came off.',
+    category: 'Civil & Furniture'
+  },
+  {
+    title: 'Switchboard Sparking / Dead Power Socket',
+    description: 'Wall power outlet is loose, sparking when plug is inserted, or has no voltage output.',
+    category: 'Electrical & Power'
+  },
+  {
+    title: 'Drinking Water Cooler Dispenser Warm or Leaking',
+    description: 'Water cooler machine is dispensing warm water and drain pipe is leaking onto the floor.',
+    category: 'Plumbing & Water Supply'
+  },
+  {
+    title: 'Lab Desktop Computer Not Booting / System Crash',
+    description: 'Computer system in lab fails to boot into Windows, hangs on startup, or displays error screen.',
+    category: 'IT & Computer Labs'
+  },
+  {
+    title: 'Dustbin Overflow & Corridor Sanitation Required',
+    description: 'Trash bins are overflowing in the area and floor requires sweeping and mopping.',
+    category: 'Sanitation & Hygiene'
+  },
+  {
+    title: 'Window Glass Broken / Frame Stuck',
+    description: 'Window pane glass is shattered or frame latch does not close, posing safety hazard.',
+    category: 'Civil & Furniture'
+  }
+];
+
 export default function ReportIssueModal({ 
   isOpen, 
   onClose, 
@@ -119,6 +194,7 @@ export default function ReportIssueModal({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Electrical & Power');
+  const [showCommonProblems, setShowCommonProblems] = useState(false);
   
   // Location selectors
   const [building, setBuilding] = useState('Building B');
@@ -417,129 +493,22 @@ export default function ReportIssueModal({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           
-          {/* 🔍 Smart Recommendation Panel — shows similar past issues for chosen location */}
-          {(showRecommendations || isFetchingRecs) && (
-            <div className="rounded-2xl bg-fuchsia-500/[0.07] border border-fuchsia-500/20 overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-fuchsia-500/15">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="w-3.5 h-3.5 text-fuchsia-400" />
-                  <span className="text-[11px] font-bold text-fuchsia-300 uppercase tracking-wider">
-                    Similar issues reported in this area
-                  </span>
-                </div>
-                {isFetchingRecs ? (
-                  <Loader2 className="w-3 h-3 text-fuchsia-400 animate-spin" />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowRecommendations(false)}
-                    className="text-slate-500 hover:text-white transition-colors text-[10px]"
-                  >
-                    ✕ dismiss
-                  </button>
-                )}
-              </div>
-              {!isFetchingRecs && recommendations.length > 0 && (
-                <div className="divide-y divide-fuchsia-500/10">
-                  {recommendations.map((rec, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => {
-                        setTitle(rec.title);
-                        setDescription(rec.description);
-                        setCategory(rec.category);
-                        setShowRecommendations(false);
-                      }}
-                      className="w-full text-left px-4 py-3 flex items-start justify-between gap-3 hover:bg-fuchsia-500/10 transition-colors group"
-                    >
-                      <div className="space-y-0.5 flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-white group-hover:text-fuchsia-200 truncate">
-                          {rec.title}
-                        </p>
-                        <p className="text-[10px] text-slate-400 truncate">{rec.category}</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1 shrink-0">
-                        <span className="text-[10px] text-fuchsia-400 font-bold whitespace-nowrap">
-                          {rec.count}× reported
-                        </span>
-                        <span className="text-[9px] text-slate-500 group-hover:text-fuchsia-300 font-medium">
-                          tap to use →
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Issue Title */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-              Issue Title
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. AC leaking water or switchboard sparking..."
-              className="w-full px-4 py-2.5 rounded-2xl bg-black/40 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-fuchsia-400 transition-colors"
-              required
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                Detailed Problem Description
-              </label>
-              {isAiClassifying && (
-                <span className="text-[10px] text-fuchsia-300 font-mono flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" /> AI Inferring Domain...
-                </span>
-              )}
-            </div>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Describe symptoms, exact location in room, and any safety hazards..."
-              className="w-full p-3.5 rounded-2xl bg-black/40 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-fuchsia-400 transition-colors resize-none"
-              required
-            />
-
-            {/* AI Real-Time Feedback Pill */}
-            {aiAnalysis && (
-              <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs flex flex-wrap items-center justify-between gap-2 mt-1">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" />
-                  <span className="text-slate-300">AI Suggested Category:</span>
-                  <span className="font-bold text-fuchsia-300">{aiAnalysis.category}</span>
-                </div>
-                {priorityData && (
-                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
-                    priorityData.priority === 'Critical' ? 'text-rose-300 bg-rose-500/20 border-rose-500/30' : 'text-amber-300 bg-amber-500/20 border-amber-500/30'
-                  }`}>
-                    {priorityData.priority} Priority ({priorityData.slaHours}h SLA)
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Location Selectors: Building & Floor & Canteens */}
+          {/* 1. Location Selectors: Building & Floor & Space (Moved to top so recommendations activate immediately) */}
           <div className="space-y-3 p-4 rounded-2xl bg-black/30 border border-white/10">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-300">
-              <MapPin className="w-4 h-4 text-fuchsia-400" />
-              <span>Campus Location & Room Selector</span>
+            <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-300">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-fuchsia-400" />
+                <span>1. Select Campus Location</span>
+              </div>
+              <span className="text-[10px] text-fuchsia-400 font-mono font-normal">
+                Recommendations update live
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Building Select */}
               <div className="space-y-1">
-                <label className="text-[11px] text-slate-400 block font-semibold">Building</label>
+                <label className="text-[11px] text-slate-400 block font-semibold">Building *</label>
                 <select
                   value={building}
                   onChange={(e) => {
@@ -547,7 +516,7 @@ export default function ReportIssueModal({
                     const defaultRoom = PRESET_LOCATIONS[e.target.value]?.[floor]?.[0]?.code || 'B202';
                     setSelectedRoomCode(defaultRoom);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer"
                 >
                   <option value="Building A">Building A</option>
                   <option value="Building B">Building B</option>
@@ -557,7 +526,7 @@ export default function ReportIssueModal({
 
               {/* Floor Select */}
               <div className="space-y-1">
-                <label className="text-[11px] text-slate-400 block font-semibold">Floor</label>
+                <label className="text-[11px] text-slate-400 block font-semibold">Floor *</label>
                 <select
                   value={floor}
                   onChange={(e) => {
@@ -565,7 +534,7 @@ export default function ReportIssueModal({
                     const defaultRoom = PRESET_LOCATIONS[building]?.[e.target.value]?.[0]?.code || 'B202';
                     setSelectedRoomCode(defaultRoom);
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer"
                 >
                   <option value="Basement">Basement</option>
                   <option value="Ground Floor">Ground Floor</option>
@@ -602,7 +571,7 @@ export default function ReportIssueModal({
                       setSelectedRoomCode(e.target.value);
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer font-medium"
+                  className="w-full px-3 py-2.5 rounded-xl bg-[#111622] border border-white/15 text-xs text-white focus:outline-none focus:border-fuchsia-400 cursor-pointer font-medium"
                 >
                   {allAvailableRooms.map((r) => (
                     <option key={r.code} value={r.code}>
@@ -614,7 +583,7 @@ export default function ReportIssueModal({
               ) : (
                 <div className="space-y-2 p-3 rounded-xl bg-white/[0.04] border border-fuchsia-500/30">
                   <div className="text-[11px] text-slate-300">
-                    Enter the new room code (e.g. <strong>B301</strong> for Building B, 3rd Floor, 1st room). It will be permanently saved so everyone can pick it right away.
+                    Enter the new room code (e.g. <strong>B301</strong>). Saved permanently for everyone.
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <input
@@ -636,6 +605,170 @@ export default function ReportIssueModal({
                 </div>
               )}
             </div>
+          </div>
+
+          {/* 2. 🔍 Smart Location Recommendation System (YouTube-like recommendations) */}
+          {(showRecommendations || isFetchingRecs) && recommendations.length > 0 && (
+            <div className="rounded-2xl bg-gradient-to-r from-fuchsia-500/[0.09] via-violet-500/[0.06] to-transparent border border-fuchsia-500/30 p-3.5 space-y-2.5 animate-fade-in shadow-xl">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-fuchsia-400 shrink-0" />
+                  <div>
+                    <span className="text-[11px] font-bold text-fuchsia-300 uppercase tracking-wider block">
+                      Recommended for {building} • {floor}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      Most reported in this area in past — tap any to auto-fill
+                    </span>
+                  </div>
+                </div>
+                {isFetchingRecs ? (
+                  <Loader2 className="w-3.5 h-3.5 text-fuchsia-400 animate-spin" />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowRecommendations(false)}
+                    className="text-slate-400 hover:text-white transition-colors text-[10px] px-2 py-0.5 rounded bg-white/[0.06]"
+                  >
+                    ✕ dismiss
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                {recommendations.map((rec, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setTitle(rec.title);
+                      setDescription(rec.description);
+                      setCategory(rec.category);
+                      setShowRecommendations(false);
+                    }}
+                    className="text-left p-3 rounded-xl bg-black/40 border border-fuchsia-500/25 hover:border-fuchsia-400 hover:bg-fuchsia-500/15 transition-all group flex flex-col justify-between cursor-pointer shadow-md"
+                  >
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-bold text-white group-hover:text-fuchsia-200 line-clamp-1">
+                        {rec.title}
+                      </div>
+                      <div className="text-[10px] text-slate-400 line-clamp-1">
+                        {rec.category}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 mt-1.5 border-t border-white/[0.08] text-[10px]">
+                      <span className="text-fuchsia-400 font-bold">
+                        {rec.count}× reported
+                      </span>
+                      <span className="text-slate-300 group-hover:text-white font-medium">
+                        tap to select →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 3. Issue Title & "Choose from common problems" Dropdown */}
+          <div className="space-y-1 relative">
+            <div className="flex items-center justify-between pb-1">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                2. Issue Title *
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowCommonProblems(!showCommonProblems)}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-fuchsia-500/15 border border-fuchsia-500/30 text-fuchsia-300 hover:bg-fuchsia-500/25 transition-all cursor-pointer shadow-sm"
+              >
+                <Sparkles className="w-3 h-3 text-fuchsia-400" />
+                <span>Choose from common problems</span>
+                <ChevronDown className={`w-3 h-3 transition-transform ${showCommonProblems ? 'rotate-180' : ''}`} />
+              </button>
+            </div>
+
+            {/* Floating Dropdown for Common Problems */}
+            {showCommonProblems && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 z-30 rounded-2xl glass-card border border-fuchsia-500/30 shadow-2xl p-2 max-h-64 overflow-y-auto backdrop-blur-2xl bg-[#0d1017]/95 divide-y divide-white/[0.06] animate-fade-in">
+                <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-fuchsia-400 tracking-wider">
+                  Select a common college issue to auto-fill:
+                </div>
+                {COMMON_CAMPUS_PROBLEMS.map((prob, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setTitle(prob.title);
+                      setDescription(prob.description);
+                      setCategory(prob.category);
+                      setShowCommonProblems(false);
+                    }}
+                    className="w-full text-left p-2.5 rounded-xl hover:bg-white/[0.08] transition-colors cursor-pointer group flex items-start justify-between gap-2"
+                  >
+                    <div>
+                      <div className="text-xs font-semibold text-white group-hover:text-fuchsia-300 transition-colors">
+                        {prob.title}
+                      </div>
+                      <div className="text-[10px] text-slate-400 line-clamp-1">
+                        {prob.description}
+                      </div>
+                    </div>
+                    <span className="shrink-0 text-[10px] px-2 py-0.5 rounded-md bg-white/[0.06] text-slate-300 border border-white/10 font-mono">
+                      {prob.category.split('&')[0]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. AC leaking water or switchboard sparking..."
+              className="w-full px-4 py-2.5 rounded-2xl bg-black/40 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-fuchsia-400 transition-colors"
+              required
+            />
+          </div>
+
+          {/* 4. Description */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+                Detailed Problem Description *
+              </label>
+              {isAiClassifying && (
+                <span className="text-[10px] text-fuchsia-300 font-mono flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" /> AI Inferring Domain...
+                </span>
+              )}
+            </div>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              placeholder="Describe symptoms, exact location in room, and any safety hazards..."
+              className="w-full p-3.5 rounded-2xl bg-black/40 border border-white/10 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-fuchsia-400 transition-colors resize-none"
+              required
+            />
+
+            {/* AI Real-Time Feedback Pill */}
+            {aiAnalysis && (
+              <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs flex flex-wrap items-center justify-between gap-2 mt-1">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" />
+                  <span className="text-slate-300">AI Suggested Category:</span>
+                  <span className="font-bold text-fuchsia-300">{aiAnalysis.category}</span>
+                </div>
+                {priorityData && (
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    priorityData.priority === 'Critical' ? 'text-rose-300 bg-rose-500/20 border-rose-500/30' : 'text-amber-300 bg-amber-500/20 border-amber-500/30'
+                  }`}>
+                    {priorityData.priority} Priority ({priorityData.slaHours}h SLA)
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Photo & Video Attachment */}

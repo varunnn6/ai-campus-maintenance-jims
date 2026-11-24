@@ -348,8 +348,8 @@ export const submitFeedback = async (req, res) => {
   }
 };
 
-// Smart location-based recommendation system
-// Returns the top frequently-reported problems for a given building/floor/room
+// Smart location-based recommendation system (YouTube-like recommendations)
+// Returns top frequently-reported problems matching the user's location input in real time
 export const getRecommendations = async (req, res) => {
   try {
     const { building, floor, room } = req.query;
@@ -358,43 +358,70 @@ export const getRecommendations = async (req, res) => {
       return res.json([]);
     }
 
-    // Build a progressive location filter: narrow as more info is provided
-    const filter = { 'location.building': building };
-    if (floor) filter['location.floor'] = floor;
-    if (room) filter['location.room'] = room;
+    // Helper to query and group complaints
+    const queryAndRank = async (filterQuery, matchScope) => {
+      const complaints = await Complaint.find(filterQuery)
+        .select('title description category location status')
+        .limit(300)
+        .lean();
 
-    // Fetch matching complaints (limit to recent 500 for performance)
-    const complaints = await Complaint.find(filter)
-      .select('title description category location')
-      .limit(500)
-      .lean();
+      if (!complaints || complaints.length === 0) return [];
 
-    if (!complaints.length) return res.json([]);
+      const freqMap = {};
+      complaints.forEach(c => {
+        const titleKey = (c.title || '').trim().toLowerCase();
+        const catKey = (c.category || '').trim();
+        const key = `${titleKey}||${catKey}`;
+        
+        if (!freqMap[key]) {
+          freqMap[key] = {
+            title: c.title,
+            description: c.description,
+            category: c.category,
+            building: c.location?.building,
+            floor: c.location?.floor,
+            room: c.location?.room,
+            matchScope: matchScope, // 'exact-room' | 'floor' | 'building'
+            count: 0
+          };
+        }
+        freqMap[key].count++;
+      });
 
-    // Group by title+category and count frequency
-    const freqMap = {};
-    complaints.forEach(c => {
-      const key = `${c.title?.trim()}||${c.category?.trim()}`;
-      if (!freqMap[key]) {
-        freqMap[key] = {
-          title: c.title,
-          description: c.description,
-          category: c.category,
-          building: c.location?.building,
-          floor: c.location?.floor,
-          room: c.location?.room,
-          count: 0
-        };
+      return Object.values(freqMap)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+    };
+
+    // 1. Try exact room if provided
+    if (room) {
+      const exactRoomFilter = { 'location.building': building };
+      if (floor) exactRoomFilter['location.floor'] = floor;
+      exactRoomFilter['location.room'] = room;
+
+      const roomResults = await queryAndRank(exactRoomFilter, 'exact-room');
+      if (roomResults.length > 0) {
+        return res.json(roomResults);
       }
-      freqMap[key].count++;
-    });
+    }
 
-    // Sort by frequency descending, return top 5
-    const sorted = Object.values(freqMap)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+    // 2. Try floor level if provided
+    if (floor) {
+      const floorFilter = { 
+        'location.building': building,
+        'location.floor': floor
+      };
+      const floorResults = await queryAndRank(floorFilter, 'floor');
+      if (floorResults.length > 0) {
+        return res.json(floorResults);
+      }
+    }
 
-    return res.json(sorted);
+    // 3. Try building level
+    const buildingFilter = { 'location.building': building };
+    const buildingResults = await queryAndRank(buildingFilter, 'building');
+    return res.json(buildingResults);
+
   } catch (err) {
     return res.status(500).json({ message: 'Error fetching recommendations', error: err.message });
   }

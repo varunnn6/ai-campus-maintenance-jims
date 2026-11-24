@@ -10,6 +10,7 @@ import TechnicianPortalView from './components/TechnicianPortalView.jsx';
 import ReportIssueModal from './components/ReportIssueModal.jsx';
 import ComplaintDetailModal from './components/ComplaintDetailModal.jsx';
 import AdminUserManagementModal from './components/AdminUserManagementModal.jsx';
+import ChangeCredentialsModal from './components/ChangeCredentialsModal.jsx';
 import { 
   CheckCircle2, 
   Loader2 
@@ -64,6 +65,7 @@ export default function App() {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportModalInitialData, setReportModalInitialData] = useState(null);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [isChangeCredentialsOpen, setIsChangeCredentialsOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   // Toast notification
@@ -293,6 +295,7 @@ export default function App() {
         setActiveTab={setActiveTab}
         onOpenReportModal={() => setIsReportModalOpen(true)}
         onOpenAddUserModal={() => setIsAddUserModalOpen(true)}
+        onOpenChangeCredentials={() => setIsChangeCredentialsOpen(true)}
       />
 
       {/* Main Content View Container */}
@@ -431,6 +434,17 @@ export default function App() {
         isOpen={isAddUserModalOpen}
         onClose={() => setIsAddUserModalOpen(false)}
         onUserAdded={handleUserAdded}
+      />
+
+      <ChangeCredentialsModal
+        isOpen={isChangeCredentialsOpen}
+        onClose={() => setIsChangeCredentialsOpen(false)}
+        currentUser={currentUser}
+        onCredentialsUpdated={(updated) => {
+          setCurrentUser(updated);
+          localStorage.setItem('campus_user', JSON.stringify(updated));
+          showToast('Credentials updated successfully!');
+        }}
       />
     </div>
   );

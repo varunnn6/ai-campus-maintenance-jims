@@ -13,7 +13,8 @@ import {
   ListTodo, 
   Inbox, 
   LogOut,
-  UserPlus
+  UserPlus,
+  Key
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -24,7 +25,8 @@ export default function Navbar({
   activeTab, 
   setActiveTab, 
   onOpenReportModal,
-  onOpenAddUserModal
+  onOpenAddUserModal,
+  onOpenChangeCredentials
 }) {
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
 
@@ -222,9 +224,25 @@ export default function Navbar({
                     </button>
                   ))}
                   
+                  {/* Change Credentials option */}
+                  {onOpenChangeCredentials && (
+                    <div className="pt-1.5 border-t border-white/10">
+                      <button
+                        onClick={() => {
+                          setRoleMenuOpen(false);
+                          onOpenChangeCredentials();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left text-xs text-fuchsia-300 hover:bg-fuchsia-500/10 transition-colors cursor-pointer"
+                      >
+                        <Key className="w-3.5 h-3.5 text-fuchsia-400" />
+                        <span>Change Credentials (OTP)</span>
+                      </button>
+                    </div>
+                  )}
+
                   {/* Logout item */}
                   {onLogout && (
-                    <div className="pt-1.5 border-t border-white/10">
+                    <div className="pt-1 border-t border-white/10">
                       <button
                         onClick={() => {
                           setRoleMenuOpen(false);

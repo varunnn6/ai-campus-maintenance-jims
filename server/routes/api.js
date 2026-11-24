@@ -13,6 +13,8 @@ const router = express.Router();
 router.post('/auth/register', authCtrl.register);
 router.post('/auth/login', authCtrl.login);
 router.post('/auth/users', authCtrl.createUser);
+router.post('/auth/send-otp', authCtrl.sendOtp);
+router.post('/auth/update-credentials', authCtrl.updateCredentials);
 router.get('/auth/me', authenticateToken, authCtrl.getCurrentUser);
 router.get('/auth/technicians', authCtrl.getTechnicians);
 

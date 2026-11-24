@@ -22,6 +22,7 @@ export default function AdminUserManagementModal({ isOpen, onClose, onUserAdded 
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [program, setProgram] = useState('MCA Shift-1');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
 
@@ -48,6 +49,7 @@ export default function AdminUserManagementModal({ isOpen, onClose, onUserAdded 
         department,
         email: email.trim(),
         phone: phone.trim(),
+        password: password.trim() || undefined,
         enrollmentNumber: role === 'student' ? enrollmentNumber.trim() : null,
         fatherName: role === 'student' ? fatherName.trim().toUpperCase() : null,
         trade: (role === 'technician' || role === 'helper') ? trade : null,
@@ -73,6 +75,7 @@ export default function AdminUserManagementModal({ isOpen, onClose, onUserAdded 
       setFatherName('');
       setPhone('');
       setEmail('');
+      setPassword('');
 
       setTimeout(() => {
         onClose();
@@ -217,60 +220,116 @@ export default function AdminUserManagementModal({ isOpen, onClose, onUserAdded 
             </div>
           )}
 
-          {/* Technician / Helper Trade */}
+          {/* Technician / Helper Trade & Credentials */}
           {(role === 'technician' || role === 'helper') && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">Assigned Trade / Skill</label>
-                <select
-                  value={trade}
-                  onChange={e => setTrade(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-fuchsia-500"
-                >
-                  <option value="Electrical & HVAC">Electrical & HVAC</option>
-                  <option value="Plumbing & Sanitation">Plumbing & Sanitation</option>
-                  <option value="Civil & Carpentry">Civil & Carpentry</option>
-                  <option value="IT & Networking">IT & Networking</option>
-                  <option value="General Maintenance">General Maintenance</option>
-                </select>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Assigned Trade / Skill</label>
+                  <select
+                    value={trade}
+                    onChange={e => setTrade(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs focus:outline-none focus:border-fuchsia-500"
+                  >
+                    <option value="Electrical & HVAC">Electrical & HVAC</option>
+                    <option value="Plumbing & Sanitation">Plumbing & Sanitation</option>
+                    <option value="Civil & Carpentry">Civil & Carpentry</option>
+                    <option value="IT & Networking">IT & Networking</option>
+                    <option value="General Maintenance">General Maintenance</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={phone} 
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="+91 98100 12345"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">Phone Number</label>
-                <input 
-                  type="text" 
-                  value={phone} 
-                  onChange={e => setPhone(e.target.value)}
-                  placeholder="+91 98100 12345"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Login Email *</label>
+                  <input 
+                    type="email" 
+                    required
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="e.g. technician@jims.edu"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Login Password *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="e.g. tech123"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono"
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {/* Faculty / Staff Fields */}
           {role === 'staff' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">Academic Department</label>
-                <input 
-                  type="text" 
-                  value={department} 
-                  onChange={e => setDepartment(e.target.value)}
-                  placeholder="e.g. MCA Department"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-                />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Academic Department</label>
+                  <input 
+                    type="text" 
+                    value={department} 
+                    onChange={e => setDepartment(e.target.value)}
+                    placeholder="e.g. MCA Department"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={phone} 
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="+91 98100 12345"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-slate-300">Official Campus Email</label>
-                <input 
-                  type="email" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="name@jims.edu"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Official Campus Email *</label>
+                  <input 
+                    type="email" 
+                    required
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="name@jims.edu"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">Login Password *</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="e.g. faculty123"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono"
+                  />
+                </div>
               </div>
             </div>
           )}

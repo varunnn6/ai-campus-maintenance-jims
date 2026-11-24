@@ -324,3 +324,157 @@ export const getTechnicians = async (req, res) => {
     return res.status(500).json({ message: 'Error fetching technicians', error: err.message });
   }
 };
+
+// In-memory fallback OTP storage
+const otpStore = new Map();
+
+// Send OTP to email or phone number for verification
+export const sendOtp = async (req, res) => {
+  try {
+    const { contact, purpose = 'credential_update' } = req.body;
+    if (!contact) {
+      return res.status(400).json({ message: 'Email or phone number is required to send OTP' });
+    }
+
+    const cleanContact = contact.trim().toLowerCase();
+    // Generate clean 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+
+    otpStore.set(cleanContact, { otp, expiresAt, purpose });
+
+    // Also persist to Firestore if available
+    try {
+      const db = getDb();
+      if (db) {
+        await db.collection('otps').doc(cleanContact.replace(/[/.]/g, '_')).set({
+          contact: cleanContact,
+          otp,
+          expiresAt: new Date(expiresAt).toISOString(),
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (e) {
+      console.warn('Firestore OTP save warning:', e.message);
+    }
+
+    return res.json({
+      success: true,
+      message: `Verification code sent to ${contact}`,
+      demoOtp: otp, // For demo showcase
+      expiresAt
+    });
+  } catch (err) {
+    console.error('sendOtp error:', err);
+    return res.status(500).json({ message: 'Failed to generate OTP', error: err.message });
+  }
+};
+
+// Verify OTP and update login credentials (email, phone, password)
+export const updateCredentials = async (req, res) => {
+  try {
+    const { 
+      userId, 
+      contact, 
+      otp, 
+      newEmail, 
+      newPhone, 
+      newPassword,
+      currentIdentifier
+    } = req.body;
+
+    if (!otp) {
+      return res.status(400).json({ message: 'OTP is required' });
+    }
+
+    const cleanContact = (contact || newEmail || newPhone || '').trim().toLowerCase();
+    
+    // Check in-memory store or Firestore
+    let stored = otpStore.get(cleanContact);
+    if (!stored) {
+      try {
+        const db = getDb();
+        if (db) {
+          const doc = await db.collection('otps').doc(cleanContact.replace(/[/.]/g, '_')).get();
+          if (doc.exists) {
+            const data = doc.data();
+            stored = {
+              otp: data.otp,
+              expiresAt: new Date(data.expiresAt).getTime()
+            };
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (!stored || stored.otp !== otp.trim()) {
+      return res.status(400).json({ message: 'Invalid or incorrect OTP. Please verify and try again.' });
+    }
+
+    if (Date.now() > stored.expiresAt) {
+      otpStore.delete(cleanContact);
+      return res.status(400).json({ message: 'OTP has expired. Please request a new verification code.' });
+    }
+
+    // OTP validated - remove from store
+    otpStore.delete(cleanContact);
+
+    const db = getDb();
+    let userDocId = userId;
+    let foundUser = null;
+
+    if (userDocId && db) {
+      const doc = await db.collection('users').doc(userDocId).get();
+      if (doc.exists) {
+        foundUser = { _id: doc.id, ...doc.data() };
+      }
+    }
+
+    if (!foundUser && db && (currentIdentifier || newEmail || contact)) {
+      const lookup = (currentIdentifier || contact || newEmail).toLowerCase().trim();
+      const snap = await db.collection('users').get();
+      snap.forEach(d => {
+        const data = d.data();
+        if (d.id === lookup || data.email?.toLowerCase() === lookup || data.enrollmentNumber === lookup || data.phone === lookup) {
+          userDocId = d.id;
+          foundUser = { _id: d.id, ...data };
+        }
+      });
+    }
+
+    const updates = {
+      updatedAt: new Date().toISOString()
+    };
+
+    if (newEmail && newEmail.trim()) {
+      updates.email = newEmail.trim().toLowerCase();
+    }
+    if (newPhone && newPhone.trim()) {
+      updates.phone = newPhone.trim();
+    }
+    if (newPassword && newPassword.trim()) {
+      const salt = await bcrypt.genSalt(10);
+      updates.password = await bcrypt.hash(newPassword.trim(), salt);
+    }
+
+    if (db && userDocId) {
+      await db.collection('users').doc(userDocId).set(updates, { merge: true });
+    }
+
+    const updatedUser = {
+      ...(foundUser || {}),
+      _id: userDocId || userId,
+      ...updates
+    };
+    delete updatedUser.password;
+
+    return res.json({
+      success: true,
+      message: 'Login credentials updated successfully!',
+      user: updatedUser
+    });
+  } catch (err) {
+    console.error('updateCredentials error:', err);
+    return res.status(500).json({ message: 'Error updating credentials', error: err.message });
+  }
+};
