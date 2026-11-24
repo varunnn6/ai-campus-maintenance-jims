@@ -330,53 +330,118 @@ export default function LoginView({ onLoginSuccess }) {
           </div>
         )}
 
-        {/* --- VIEW 2: FACULTY & OPERATIONS QUICK ACCESS --- */}
+        {/* --- VIEW 2: FACULTY & OPERATIONS LOGIN --- */}
         {authMode === 'staff-ops' && (
           <div className="space-y-6">
-            
-            <div className="text-center space-y-1">
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                Campus Operations Access
-              </h2>
-              <p className="text-xs text-slate-400">
-                One-click authenticated access for Faculty, Field Technicians, and Administration.
-              </p>
+
+            {/* Primary: Personal credential login */}
+            <div className="max-w-lg mx-auto p-6 sm:p-8 rounded-[32px] glass-card border border-white/20 shadow-2xl space-y-6">
+
+              <div className="border-b border-white/10 pb-4">
+                <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+                  <Wrench className="w-5 h-5 text-fuchsia-400" />
+                  <span>Staff & Operations Login</span>
+                </h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  Login with your email and password assigned by the campus administrator.
+                </p>
+              </div>
+
+              <form onSubmit={handleManualStaffLogin} autoComplete="off" className="space-y-4">
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300">
+                    Campus Email *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    autoComplete="off"
+                    value={staffEmail}
+                    onChange={(e) => setStaffEmail(e.target.value)}
+                    placeholder="e.g. rajesh.kumar@jims.edu"
+                    className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-slate-300 flex items-center justify-between">
+                    <span>Password *</span>
+                    <span className="text-[10px] text-slate-500">Set by admin</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      required
+                      autoComplete="new-password"
+                      value={staffPassword}
+                      onChange={(e) => setStaffPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                    />
+                    <Lock className="w-4 h-4 text-slate-500 absolute right-4 top-3.5 pointer-events-none" />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full py-3.5 rounded-2xl bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-xl shadow-white/20 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
+                      <span>Signing In...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+
+              </form>
             </div>
 
-            {/* 3 Clean Generic Cards (No personal names) */}
+            {/* Divider */}
+            <div className="max-w-lg mx-auto flex items-center gap-3">
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="text-[11px] text-slate-500 font-medium">or use demo quick access</span>
+              <div className="flex-1 h-px bg-white/10" />
+            </div>
+
+            {/* Secondary: Generic demo one-click cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {GENERIC_STAFF_ROLES.map((roleObj) => {
                 const Icon = roleObj.icon;
                 return (
                   <div
                     key={roleObj.role}
-                    className="p-6 rounded-[28px] glass-card border border-white/15 shadow-xl flex flex-col justify-between space-y-4 hover:border-white/30 transition-all group"
+                    className="p-5 rounded-[24px] glass-card border border-white/10 shadow-xl flex flex-col justify-between space-y-3 hover:border-white/20 transition-all group"
                   >
-                    <div className="space-y-3">
-                      <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                        <Icon className="w-6 h-6 text-fuchsia-400" />
+                    <div className="space-y-2">
+                      <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Icon className="w-5 h-5 text-fuchsia-400" />
                       </div>
                       <div>
-                        <h3 className="text-sm font-bold text-white">{roleObj.title}</h3>
-                        <p className="text-[11px] text-fuchsia-400 font-medium">{roleObj.subtitle}</p>
+                        <h3 className="text-xs font-bold text-white">{roleObj.title}</h3>
+                        <p className="text-[10px] text-fuchsia-400 font-medium">{roleObj.subtitle}</p>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {roleObj.desc}
-                      </p>
                     </div>
 
                     <button
                       type="button"
                       disabled={isLoading}
                       onClick={() => handleGenericStaffLogin(roleObj)}
-                      className="w-full py-2.5 rounded-full bg-white text-slate-900 hover:bg-slate-100 text-xs font-bold transition-all cursor-pointer shadow-md active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
+                      className="w-full py-2 rounded-full bg-white/[0.08] border border-white/15 text-slate-300 hover:bg-white/[0.14] text-[11px] font-semibold transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
                     >
                       {isLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <Loader2 className="w-3 h-3 animate-spin" />
                       ) : (
                         <>
-                          <span>Enter as {roleObj.title}</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <span>Demo: Enter as {roleObj.title}</span>
+                          <ArrowRight className="w-3 h-3" />
                         </>
                       )}
                     </button>
