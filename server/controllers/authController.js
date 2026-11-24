@@ -401,10 +401,19 @@ export const sendOtp = async (req, res) => {
       console.warn('Firestore OTP save warning:', e.message);
     }
 
-    // Dispatch real email via SMTP
+    // Dispatch real email via SMTP with resilient timeout
     let emailResult = { sent: false };
     if (cleanContact.includes('@')) {
-      emailResult = await sendOtpEmail(cleanContact, otp);
+      try {
+        const mailPromise = sendOtpEmail(cleanContact, otp);
+        const timeoutPromise = new Promise((resolve) =>
+          setTimeout(() => resolve({ sent: false, timeout: true, error: 'SMTP response timed out after 7s' }), 7000)
+        );
+        emailResult = await Promise.race([mailPromise, timeoutPromise]);
+      } catch (mailErr) {
+        console.error('[sendOtp] Mail dispatch error:', mailErr);
+        emailResult = { sent: false, error: mailErr.message };
+      }
     }
 
     // Mask email for privacy (e.g. va*****16@gmail.com)

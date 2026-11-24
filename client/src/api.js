@@ -16,29 +16,45 @@ export async function apiRequest(endpoint, options = {}) {
     ? cleanEndpoint 
     : `${API_BASE}${cleanEndpoint.startsWith('/') ? '' : '/'}${cleanEndpoint}`;
 
-  const res = await fetch(url, options);
+  // Set 12-second timeout to prevent indefinite loading in UI
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
 
-  const contentType = res.headers.get('content-type') || '';
-  let data;
-  
-  if (contentType.includes('application/json')) {
-    try {
-      data = await res.json();
-    } catch (e) {
-      data = { message: 'Failed to parse JSON response' };
+  try {
+    const res = await fetch(url, {
+      ...options,
+      signal: options.signal || controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    const contentType = res.headers.get('content-type') || '';
+    let data;
+    
+    if (contentType.includes('application/json')) {
+      try {
+        data = await res.json();
+      } catch (e) {
+        data = { message: 'Failed to parse JSON response' };
+      }
+    } else {
+      const text = await res.text();
+      data = { message: text || `HTTP Status ${res.status}` };
     }
-  } else {
-    const text = await res.text();
-    data = { message: text || `HTTP Status ${res.status}` };
-  }
 
-  if (!res.ok) {
-    const errorMsg = data?.message || data?.error || `Request failed with HTTP status ${res.status}`;
-    const err = new Error(errorMsg);
-    err.status = res.status;
-    err.data = data;
+    if (!res.ok) {
+      const errorMsg = data?.message || data?.error || `Request failed with HTTP status ${res.status}`;
+      const err = new Error(errorMsg);
+      err.status = res.status;
+      err.data = data;
+      throw err;
+    }
+
+    return data;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Server request timed out. Please check your network and try again.');
+    }
     throw err;
   }
-
-  return data;
 }
