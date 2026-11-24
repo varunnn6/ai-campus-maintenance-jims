@@ -612,7 +612,7 @@ export const sendOtp = async (req, res) => {
       try {
         const mailPromise = sendOtpEmail(cleanContact, otp);
         const timeoutPromise = new Promise((resolve) =>
-          setTimeout(() => resolve({ sent: false, timeout: true, error: 'SMTP response timed out after 7s' }), 7000)
+          setTimeout(() => resolve({ sent: false, timeout: true, error: 'SMTP response timed out after 4s' }), 4000)
         );
         emailResult = await Promise.race([mailPromise, timeoutPromise]);
       } catch (mailErr) {

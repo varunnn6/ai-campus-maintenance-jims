@@ -16,9 +16,9 @@ export async function apiRequest(endpoint, options = {}) {
     ? cleanEndpoint 
     : `${API_BASE}${cleanEndpoint.startsWith('/') ? '' : '/'}${cleanEndpoint}`;
 
-  // Set 12-second timeout to prevent indefinite loading in UI
+  // Set 15-second timeout to prevent indefinite loading in UI
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const res = await fetch(url, {
