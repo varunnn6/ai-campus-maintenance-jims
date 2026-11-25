@@ -200,10 +200,6 @@ export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
         <div className="text-center space-y-3">
           <div className="flex flex-col items-center gap-3">
             <img src="/logo.png" alt="CampusOps Logo" className="w-16 h-16 rounded-full shadow-2xl shadow-fuchsia-500/30 border border-white/20 object-cover" />
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card border border-white/20 text-xs font-semibold text-slate-200 shadow-xl backdrop-blur-xl">
-              <Sparkles className="w-3.5 h-3.5 text-fuchsia-400" />
-              <span>Jagan Institute of Management Studies • Rohini Sector-5</span>
-            </div>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
