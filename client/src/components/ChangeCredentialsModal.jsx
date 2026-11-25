@@ -12,7 +12,9 @@ import {
   Sparkles,
   User,
   GraduationCap,
-  Wrench
+  Wrench,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
@@ -21,6 +23,8 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
   const [identifierInput, setIdentifierInput] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otp, setOtp] = useState('');
   const [emailDispatched, setEmailDispatched] = useState(false);
   const [displayMaskedEmail, setDisplayMaskedEmail] = useState('');
@@ -237,15 +241,25 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
                 <span>New Password *</span>
               </label>
-              <input
-                type="password"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password (min. 4 characters)"
-                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-                autoFocus={Boolean(currentUser)}
-              />
+              <div className="relative">
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min. 4 characters)"
+                  className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                  autoFocus={Boolean(currentUser)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             {/* Confirm Password */}
@@ -254,14 +268,24 @@ export default function ChangeCredentialsModal({ isOpen, onClose, currentUser, o
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
                 <span>Confirm New Password *</span>
               </label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter new password"
-                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Re-enter new password"
+                  className="w-full pl-4 pr-10 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
             {/* Registered Email Status or Missing Notice */}

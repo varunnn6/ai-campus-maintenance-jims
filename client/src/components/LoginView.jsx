@@ -9,7 +9,9 @@ import {
   ArrowRight, 
   Loader2, 
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { apiRequest } from '../api.js';
 
@@ -19,10 +21,12 @@ export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
   // Student form state
   const [studentIdentifier, setStudentIdentifier] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
   
   // Staff/Tech/Admin form state
   const [staffEmail, setStaffEmail] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
+  const [showStaffPassword, setShowStaffPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -295,15 +299,22 @@ export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
                 </label>
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showStudentPassword ? 'text' : 'password'}
                     required
                     autoComplete="new-password"
                     value={studentPassword}
-                    onChange={(e) => setStudentPassword(e.target.value.toUpperCase())}
+                    onChange={(e) => setStudentPassword(e.target.value)}
                     placeholder="e.g. VIKRAM CHOPRA"
-                    className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono tracking-wider uppercase"
+                    className="w-full pl-4 pr-11 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors font-mono tracking-wider"
                   />
-                  <Lock className="w-4 h-4 text-slate-500 absolute right-4 top-3.5 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={() => setShowStudentPassword(!showStudentPassword)}
+                    className="absolute right-3.5 top-3 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    aria-label={showStudentPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -386,15 +397,22 @@ export default function LoginView({ onLoginSuccess, onOpenResetPassword }) {
                   </label>
                   <div className="relative">
                     <input
-                      type="password"
+                      type={showStaffPassword ? 'text' : 'password'}
                       required
                       autoComplete="new-password"
                       value={staffPassword}
                       onChange={(e) => setStaffPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full px-4 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
+                      className="w-full pl-4 pr-11 py-3 rounded-2xl bg-white/[0.05] border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-fuchsia-500 transition-colors"
                     />
-                    <Lock className="w-4 h-4 text-slate-500 absolute right-4 top-3.5 pointer-events-none" />
+                    <button
+                      type="button"
+                      onClick={() => setShowStaffPassword(!showStaffPassword)}
+                      className="absolute right-3.5 top-3 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                      aria-label={showStaffPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showStaffPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
