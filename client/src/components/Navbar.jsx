@@ -113,10 +113,8 @@ export default function Navbar({
             else setActiveTab('dashboard');
           }}
         >
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-fuchsia-500 via-violet-500 to-amber-300 p-[1px] shadow-lg shadow-fuchsia-500/20">
-            <div className="w-full h-full rounded-full bg-[#0E0F15] flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-fuchsia-300" />
-            </div>
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-fuchsia-500 via-violet-500 to-amber-300 p-[1px] shadow-lg shadow-fuchsia-500/20 overflow-hidden">
+            <img src="/logo.png" alt="CampusOps Logo" className="w-full h-full rounded-full object-cover" />
           </div>
           <div>
             <span className="font-bold text-xs sm:text-sm tracking-tight text-white block">CampusOps</span>
